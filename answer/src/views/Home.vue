@@ -1,13 +1,14 @@
 <template>
-  <div class="home">
-    <img src="../assets/logos.jpg" />
-  </div>
+	<div class="home">
+		<HomePage></HomePage>
+	</div>
 </template>
 
 <script>
-
-
-export default {
-  
-}
+	import HomePage from "../components/HomePage.vue"
+	export default {
+		components: {
+			HomePage
+		}
+	}
 </script>
