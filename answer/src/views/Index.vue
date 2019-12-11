@@ -36,23 +36,31 @@
 			<div>
 				<!-- 每日一练 -->
 				<div class="daily_test">
-					<img :src="daily" width="93.75%" />
+					<router-link>
+						<img :src="daily" width="93.75%" />
+					</router-link>
 				</div>
 				<!-- 栅格 -->
 				<van-row type="flex" justify="center" style="margin-top: -10px;">
 					<!-- 真题模拟 -->
 					<van-col span="11" style="margin-left:3px;">
-						<img :src="real" width="100%" />
+						<router-link>
+							<img :src="real" width="100%" />
+						</router-link>
 					</van-col>
 					<van-col span="11" style="margin-left: 5px;">
 						<van-row>
 							<!-- 我的收藏 -->
 							<van-col span="24">
-								<img :src="my" width="100%" />
+								<router-link>
+									<img :src="my" width="100%" />
+								</router-link>
 							</van-col>
 							<!-- 错题本 -->
 							<van-col span="24" style="margin-top: -7px;">
-								<img :src="errow" width="100%" />
+								<router-link>
+									<img :src="errow" width="100%" />
+								</router-link>
 							</van-col>
 						</van-row>
 					</van-col>

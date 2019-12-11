@@ -10,15 +10,14 @@ module.exports = {
 		// 配置http跨域代理
 		proxy: {
 			'/api': {
-				target: 'http://api.ceshixia.com',
+				target: 'http://answerapi.ceshixia.com',
 				changeOrigin: true,
 				ws: true,
 				pathRewrite: {
 					'^/api': ''
 				}
 			}
-		}, // string | Object
-
+		},
 	},
 	// rem自适应配置
 	css: {
