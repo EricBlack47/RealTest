@@ -2,7 +2,8 @@
  * api接口统一管理
  */
 import {
-	postfromdata
+	postfromdata,
+	get
 } from './http'
 
 // 接口示例
@@ -12,3 +13,9 @@ import {
 export const PostRegister=obj=>postfromdata('/api/register',obj)
 // 登录
 export const PostLogin=obj=>postfromdata('/api/login',obj)
+// 查询题目
+export const GetDailyTest=obj=>get('/api/oneday',obj)
+// 收藏题目
+export const GetAddcollection=obj=>get('/api/addcollection',obj)
+// 取消收藏
+export const GetCancelcollection=obj=>get('/api/deletcollection',obj)

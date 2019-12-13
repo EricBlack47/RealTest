@@ -36,7 +36,7 @@
 			<div>
 				<!-- 每日一练 -->
 				<div class="daily_test">
-					<router-link>
+					<router-link to="/test">
 						<img :src="daily" width="93.75%" />
 					</router-link>
 				</div>
@@ -44,7 +44,7 @@
 				<van-row type="flex" justify="center" style="margin-top: -10px;">
 					<!-- 真题模拟 -->
 					<van-col span="11" style="margin-left:3px;">
-						<router-link>
+						<router-link to="/test">
 							<img :src="real" width="100%" />
 						</router-link>
 					</van-col>
@@ -52,13 +52,13 @@
 						<van-row>
 							<!-- 我的收藏 -->
 							<van-col span="24">
-								<router-link>
+								<router-link to="/test">
 									<img :src="my" width="100%" />
 								</router-link>
 							</van-col>
 							<!-- 错题本 -->
 							<van-col span="24" style="margin-top: -7px;">
-								<router-link>
+								<router-link to="/test">
 									<img :src="errow" width="100%" />
 								</router-link>
 							</van-col>

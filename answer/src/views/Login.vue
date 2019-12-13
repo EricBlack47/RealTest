@@ -71,6 +71,7 @@
 					} else if (res.code == "200") {
 						this.$toast.clear();
 						this.$toast(res.msg)
+						localStorage.setItem("userid",res.userid)
 						this.$router.push({
 							path: '/index'
 						})

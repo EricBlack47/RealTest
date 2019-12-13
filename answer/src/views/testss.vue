@@ -8,8 +8,15 @@
 					<li v-for="(item2,index2) in item.option" :key="index2">
 						<van-row>
 							<van-col span="3">
-								<div v-bind:class="item2.bindclasssssss=='lefts'?'lefts':''"></div>
-
+								<div v-if="item2.bindclasssssss=='lefts'">
+									<div class="lefts"></div>
+								</div>
+								<div v-if="item2.bindclasssssss=='yes'">
+									<div class="yes"></div>
+								</div>
+								<div v-if="item2.bindclasssssss=='error'">
+									<div class="error"></div>
+								</div>
 							</van-col>
 							<van-col span="21">
 								<div>{{item2.bindclasssssss}}</div>
@@ -95,15 +102,19 @@
 			active(index, index2) {
 				window.console.log(index)
 				window.console.log(index2)
-				var listsssss=this.lsit
-				if (listsssss[index].option[index2].title == listsssss[index].rig_key) {
-					listsssss[index].option[index2].bindclasssssss = "yes";
-				} else {
-					listsssss[index].option[index2].bindclasssssss = "error";
-				}
-				this.lsit=listsssss;
-				window.console.log(this.lsit);
 
+				if (this.lsit[index].option[index2].title == this.lsit[index].rig_key) {
+					this.lsit[index].option[index2].bindclasssssss = "yes";
+				} else {
+					this.lsit[index].option[index2].bindclasssssss = "error";
+					for (var i = 0; i < this.lsit[index].option.length; i++) {
+						if (this.lsit[index].option[i].title == this.lsit[index].rig_key) {
+							this.lsit[index].option[i].bindclasssssss = "yes";
+						}
+					}
+				}
+
+				this.$forceUpdate();
 			},
 
 
