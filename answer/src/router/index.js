@@ -5,6 +5,7 @@ import Test from '../views/Test.vue'
 import Index from '../views/Index.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
+import DailyTest from '../views/DailyTest.vue'
 
 Vue.use(VueRouter)
 
@@ -33,6 +34,11 @@ const routes = [{
 		name: 'register',
 		component: Register
 	},
+	{
+		path: '/dailytest',
+		name: 'dailytest',
+		component: DailyTest
+	}
 ]
 
 const router = new VueRouter({

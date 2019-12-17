@@ -36,7 +36,7 @@
 			<div>
 				<!-- 每日一练 -->
 				<div class="daily_test">
-					<router-link to="/test">
+					<router-link to="/dailytest">
 						<img :src="daily" width="93.75%" />
 					</router-link>
 				</div>

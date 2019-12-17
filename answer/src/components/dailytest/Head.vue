@@ -174,6 +174,10 @@
 				subjectid: 0
 			}
 		},
+		mounted() {
+			var subject_list = []
+			localStorage.setItem("array",JSON.stringify(subject_list))
+		},
 		created() {
 			GetDailyTest().then(res => {
 				this.lists = res.data
@@ -223,10 +227,12 @@
 				this.question = this.lists[index]
 				this.show = false
 				this.checked = ''
-				this.right_key = this.question[0].right_key
+				this.right_key = ''
 				for (var i = 0; i < this.question[0].option.length; i++) {
 					this.question[0].option[i].bindclass = "icon-xxx iconfont checkbox"
 				}
+				
+				//this.selectItem()
 			},
 			// 选择选项
 			selectItem(index) {
@@ -244,7 +250,21 @@
 					this.clickable += 1
 					this.score += 1
 					this.checked = this.question[0].option[index].sorts
-					this.$forceUpdate();
+					this.right_key = this.question[0].right_key					
+					// 当前选项
+					var subjectdata = {"subject_id":this.question[0].id,"subject_item":this.checked,"subject_right":this.right_key}
+					// 取出localstorage里的数组
+					var str_subject_list = JSON.parse(localStorage.getItem("array"))
+					// 如果数组为空，则添加当前选项数据	
+					str_subject_list.push(subjectdata)
+					// for(var j=0;j<str_subject_list;j++){
+					// 	if(str_subject_list[j].subject_id == this.question[0].id){
+					// 		str_subject_list.pop(str_subject_list[j])
+					// 	}
+					// }
+
+					localStorage.setItem("array",JSON.stringify(str_subject_list))
+					this.$forceUpdate()
 				}
 			},
 			// 上一题
@@ -255,7 +275,7 @@
 				} else {
 					var prve = this.active - 2
 					this.selected(prve)
-					this.clickable = 0
+					this.clickable += 1
 				}
 			},
 			// 下一题
@@ -278,7 +298,8 @@
 						this.question[0].option[i].bindclass = "icon-xxx iconfont checkbox"
 					}
 				})
-				this.$toast("已经被你刷完了！")
+				localStorage.clear()
+				this.$toast("已经刷新题目！")
 			}
 		}
 	}

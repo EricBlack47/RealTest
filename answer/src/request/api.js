@@ -19,3 +19,5 @@ export const GetDailyTest=obj=>get('/api/oneday',obj)
 export const GetAddcollection=obj=>get('/api/addcollection',obj)
 // 取消收藏
 export const GetCancelcollection=obj=>get('/api/deletcollection',obj)
+// 请求真题列表
+export const GetRealTest=obj=>get('/api/question',obj)
