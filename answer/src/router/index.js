@@ -6,6 +6,8 @@ import Index from '../views/Index.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 import DailyTest from '../views/DailyTest.vue'
+import Lists from '../views/Lists.vue'
+import RealTest from '../views/RealTest.vue'
 
 Vue.use(VueRouter)
 
@@ -38,6 +40,16 @@ const routes = [{
 		path: '/dailytest',
 		name: 'dailytest',
 		component: DailyTest
+	},
+	{
+		path: '/lists',
+		name: 'lists',
+		component: Lists
+	},
+	{
+		path: '/realtest',
+		name: 'realtest',
+		component: RealTest
 	}
 ]
 

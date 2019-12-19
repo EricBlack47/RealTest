@@ -44,7 +44,7 @@
 				<van-row type="flex" justify="center" style="margin-top: -10px;">
 					<!-- 真题模拟 -->
 					<van-col span="11" style="margin-left:3px;">
-						<router-link to="/test">
+						<router-link to="/lists">
 							<img :src="real" width="100%" />
 						</router-link>
 					</van-col>

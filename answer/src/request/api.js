@@ -20,4 +20,6 @@ export const GetAddcollection=obj=>get('/api/addcollection',obj)
 // 取消收藏
 export const GetCancelcollection=obj=>get('/api/deletcollection',obj)
 // 请求真题列表
-export const GetRealTest=obj=>get('/api/question',obj)
+export const GetRealTestList=obj=>get('/api/queryrecord',obj)
+// 根据真题名字请求真题
+export const GetRealTest=obj=>get('/api/getquestion',obj)
