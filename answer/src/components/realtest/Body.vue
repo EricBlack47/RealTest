@@ -58,6 +58,8 @@
 					</div>
 				</div>
 			</van-overlay>
+			<!-- 正确率 -->
+			
 		</div>
 		<!-- 题目 -->
 		<div class="question_body" v-if="question">
@@ -85,11 +87,11 @@
 				<p>{{'第'+active+'题/共'+limit+'题'}}</p>
 			</div>
 			<!-- 答案解析 -->
-			<div class="test_desc question_text" v-if="checked!=''" style="margin-bottom: 100px;">
+			<!-- <div class="test_desc question_text" v-if="checked!=''" style="margin-bottom: 100px;">
 				<p>试题解析</p>
 				<p>【答案】{{question[0].right_key}}</p>
 				<p>{{question[0].analysis}}</p>
-			</div>
+			</div> -->
 		</div>
 		<!-- 底部按钮 -->
 		<div class="prve_next">
@@ -117,7 +119,7 @@
 							<i class="iconfont icon-xxx" style="color: #85B8FD;">&#xe617;</i>
 						</van-col>
 						<van-col span="14">
-							<van-count-down :time="time" format="倒计时:mm:ss"/>
+							<van-count-down :time="time" format="倒计时:mm:ss" />
 						</van-col>
 					</van-row>
 				</van-col>
@@ -143,7 +145,7 @@
 							</div>
 						</van-col>
 						<van-col span="8">
-							<div class="add_like">
+							<div class="add_like" @click="commit_test">
 								<p>提交</p>
 							</div>
 						</van-col>
@@ -251,15 +253,9 @@
 				// 返回已做过的题目时，将已选择的选项标上颜色
 				for (var k = 0; k < str_subject_list.length; k++) {
 					if (this.question[0].id == str_subject_list[k].subject_id) {
-						this.checked = str_subject_list[k].subject_item
-						this.right_key = str_subject_list[k].right_key
 						for (var j = 0; j < this.question[0].option.length; j++) {
-							if (this.question[0].option[j].sorts == str_subject_list[k].subject_right) {
+							if (this.question[0].option[j].sorts == str_subject_list[k].subject_item) {
 								this.question[0].option[j].bindclass = 'icon-xxx iconfont checkedbox'
-							} else {
-								if (this.question[0].option[j].sorts == str_subject_list[k].subject_item) {
-									this.question[0].option[j].bindclass = 'icon-xxx iconfont checedfalse'
-								}
 							}
 						}
 					}
@@ -269,23 +265,19 @@
 			selectItem(index) {
 				if (this.checked == '') {
 					if (this.question[0].right_key == this.question[0].option[index].sorts) {
+						this.score += 1
 						this.question[0].option[index].bindclass = 'icon-xxx iconfont checkedbox'
 					} else {
-						this.question[0].option[index].bindclass = 'icon-xxx iconfont checedfalse'
-						for (var i = 0; i < this.question[0].option.length; i++) {
-							if (this.question[0].option[i].sorts == this.question[0].right_key) {
-								this.question[0].option[i].bindclass = 'icon-xxx iconfont checkedbox'
-							}
-						}
+						this.question[0].option[index].bindclass = 'icon-xxx iconfont checkedbox'
 					}
-					this.score += 1
 					this.checked = this.question[0].option[index].sorts
 					this.right_key = this.question[0].right_key
 					// 当前选项数据
 					var subjectdata = {
 						"subject_id": this.question[0].id,
 						"subject_item": this.checked,
-						"subject_right": this.right_key
+						"subject_right": this.right_key,
+						"subject_index": index+1
 					}
 					// 取出localstorage里的数组
 					var str_subject_list = JSON.parse(localStorage.getItem("array"))
@@ -307,13 +299,17 @@
 			},
 			// 下一题
 			go_next() {
-				if (this.active < 30) {
+				if (this.active < 100) {
 					var next = this.active
 					this.selected(next)
 				} else {
 					this.$toast("已经是最后一题了！")
 				}
 			},
+			// 提交
+			commit_test(){
+				
+			}
 		}
 	}
 </script>
@@ -488,12 +484,10 @@
 		font-size: 16px;
 		color: #7AAFFA;
 	}
-	
-	.van-count-down{
+
+	.van-count-down {
 		color: #85B8FD;
 		padding: 12px 0;
 		font-size: 12px;
 	}
-	
-	
 </style>
