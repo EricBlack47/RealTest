@@ -2,8 +2,8 @@
 	<div>
 		<!-- 头部 -->
 		<div class="head_bg">
-			<van-row>
-				<van-col span="11">
+			<van-row style="line-height:2 ;">
+				<van-col span="11" v-if="showAdd">
 					<van-row>
 						<van-col offset="4" span="6">
 							<!-- 添加收藏图标 -->
@@ -17,10 +17,24 @@
 						<van-col span="12">
 							<!-- 添加收藏文字 -->
 							<div class="add_like" v-show="unlike" @click="changeLike">
-								<p style="color: #85B8FD;">收藏此题</p>
+								<p style="color: #85B8FD;margin: 10px 0 14px 0;">收藏此题</p>
 							</div>
 							<div class="add_like" v-show="liked" @click="changeUnlike">
-								<p style="color: #85B8FD;">取消收藏</p>
+								<p style="color: #85B8FD;margin: 10px 0 14px 0;">取消收藏</p>
+							</div>
+						</van-col>
+					</van-row>
+				</van-col>
+				<van-col span="11" v-if="showRed">
+					<van-row>
+						<van-col offset="2" span="6">
+							<div class="like_icon" @click="show = true">
+								<i class="iconfont icon-xxx" style="color: #83B6FF;">&#xe6a6;</i>
+							</div>
+						</van-col>
+						<van-col span="12">
+							<div class="add_like" @click="show = true">
+								<p style="color: #85B8FD;margin: 10px 0 14px 0;">跳转试题</p>
 							</div>
 						</van-col>
 					</van-row>
@@ -38,12 +52,16 @@
 						</van-col>
 						<van-col span="12">
 							<div class="add_like" @click="show = true">
-								<p style="color: #85B8FD;">跳转试题</p>
+								<p style="color: #85B8FD;margin: 10px 0 14px 0;">跳转试题</p>
 							</div>
 						</van-col>
 					</van-row>
 				</van-col>
 			</van-row>
+			<!-- 正确率 -->
+			<div v-if="showResult" class="test_result">
+				<h2>{{"正确率:&nbsp;&nbsp;"+score+"&nbsp;%"}}</h2>
+			</div>
 			<!-- 跳转弹出窗 -->
 			<van-overlay :show="show">
 				<div class="wrapper" @click.stop>
@@ -58,9 +76,8 @@
 					</div>
 				</div>
 			</van-overlay>
-			<!-- 正确率 -->
-			
 		</div>
+
 		<!-- 题目 -->
 		<div class="question_body" v-if="question">
 			<!-- 题目描述 -->
@@ -137,16 +154,16 @@
 						</van-col>
 					</van-row>
 				</van-col>
-				<van-col span="12" v-if="active==100">
+				<van-col span="7" v-if="active==100">
 					<van-row>
 						<van-col offset="4" span="6">
 							<div class="like_icon">
-								<i class="iconfont icon-xxx" style="color: #83B6FF;">&#xe650;</i>
+								<i class="iconfont icon-xxx" style="color: #FFFFFF;">&#xe650;</i>
 							</div>
 						</van-col>
 						<van-col span="8">
 							<div class="add_like" @click="commit_test">
-								<p>提交</p>
+								<p style="color: #FFFFFF;">交卷</p>
 							</div>
 						</van-col>
 					</van-row>
@@ -183,7 +200,10 @@
 				limit: 100,
 				testname: '',
 				percentage: '',
-				time: 120 * 60 * 1000
+				time: 120 * 60 * 1000,
+				showResult: true,
+				showRed:false,
+				showAdd:true
 			}
 		},
 		mounted() {
@@ -277,7 +297,7 @@
 						"subject_id": this.question[0].id,
 						"subject_item": this.checked,
 						"subject_right": this.right_key,
-						"subject_index": index+1
+						"subject_index": index + 1
 					}
 					// 取出localstorage里的数组
 					var str_subject_list = JSON.parse(localStorage.getItem("array"))
@@ -307,8 +327,8 @@
 				}
 			},
 			// 提交
-			commit_test(){
-				
+			commit_test() {
+
 			}
 		}
 	}
@@ -340,7 +360,7 @@
 		background-repeat: no-repeat;
 		background-size: 100% 100%;
 		width: 358px;
-		height: 54px;
+		/* height: 54px; */
 		margin: 0 auto;
 	}
 
@@ -489,5 +509,13 @@
 		color: #85B8FD;
 		padding: 12px 0;
 		font-size: 12px;
+	}
+	.test_result h2{
+		padding: 12px 0 42px 0;
+		margin: 0 auto;
+		border-top: 1px solid #E3E3E3;
+		width: 95%;
+		font-size: 28px;
+		color: #83B6FF;
 	}
 </style>
