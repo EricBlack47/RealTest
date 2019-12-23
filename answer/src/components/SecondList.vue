@@ -19,7 +19,7 @@
 								</van-col>
 								<van-col span="16">
 									<div class="list_sub">
-										<p>{{item.percentage=="100%"?item.rate+"正确率":"剩余时间："+item.times/60+":"+(7200-item.times)}}</p>
+										<p>{{item.percentage=="100%"?item.rate+"正确率":"剩余时间："}}</p>
 									</div>
 								</van-col>
 							</van-row>
@@ -54,6 +54,8 @@
 			var userid = localStorage.getItem("userid")
 			this.userid = userid
 			this.getRealTest()
+			var subject_list = []
+			localStorage.setItem("real_array", JSON.stringify(subject_list))
 		},
 		created() {
 			

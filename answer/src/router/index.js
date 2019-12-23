@@ -11,7 +11,8 @@ import RealTest from '../views/RealTest.vue'
 
 Vue.use(VueRouter)
 
-const routes = [{
+const routes = [
+	{
 		path: '/',
 		name: 'home',
 		component: Home
@@ -20,6 +21,11 @@ const routes = [{
 		path: '/test',
 		name: 'test',
 		component: Test
+	},
+	{
+		path: '/extension',
+		name: 'home',
+		component: Home
 	},
 	{
 		path: '/index',

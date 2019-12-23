@@ -3,7 +3,7 @@
 		<!-- 头部 -->
 		<div class="head_bg">
 			<van-row style="line-height:2 ;">
-				<van-col span="11" v-if="showAdd">
+				<van-col span="11" v-show="showAdd">
 					<van-row>
 						<van-col offset="4" span="6">
 							<!-- 添加收藏图标 -->
@@ -25,16 +25,16 @@
 						</van-col>
 					</van-row>
 				</van-col>
-				<van-col span="11" v-if="showRed">
+				<van-col span="11" v-show="showRed">
 					<van-row>
 						<van-col offset="2" span="6">
 							<div class="like_icon" @click="show = true">
-								<i class="iconfont icon-xxx" style="color: #83B6FF;">&#xe6a6;</i>
+								<i class="iconfont icon-xxx" style="color: #83B6FF;">&#xe600;</i>
 							</div>
 						</van-col>
 						<van-col span="12">
-							<div class="add_like" @click="show = true">
-								<p style="color: #85B8FD;margin: 10px 0 14px 0;">跳转试题</p>
+							<div class="add_like" @click="show_errow">
+								<p style="color: #85B8FD;margin: 10px 0 14px 0;">只看错题</p>
 							</div>
 						</van-col>
 					</van-row>
@@ -111,7 +111,7 @@
 			</div> -->
 		</div>
 		<!-- 底部按钮 -->
-		<div class="prve_next">
+		<div class="prve_next" v-show="showComit">
 			<van-row>
 				<van-col span="7">
 					<van-row>
@@ -133,10 +133,10 @@
 				<van-col span="10" style="background: #FFFFFF;">
 					<van-row>
 						<van-col span="7" style="margin: 12px 0;text-align: right;">
-							<i class="iconfont icon-xxx" style="color: #85B8FD;">&#xe617;</i>
+							<i class="iconfont icon-xxx" style="color: #85B8FD;font-size: 18px;">&#xe617;</i>
 						</van-col>
 						<van-col span="14">
-							<van-count-down :time="time" format="倒计时:mm:ss" />
+							<van-count-down :time="time" style="font-size: 13px;" format="倒计时:mm:ss" />
 						</van-col>
 					</van-row>
 				</van-col>
@@ -162,8 +162,35 @@
 							</div>
 						</van-col>
 						<van-col span="8">
-							<div class="add_like" @click="commit_test">
+							<div class="add_like" @click="commit_test"  ref="countDown">
 								<p style="color: #FFFFFF;">交卷</p>
+							</div>
+						</van-col>
+					</van-row>
+				</van-col>
+			</van-row>
+		</div>
+		<!-- 底部按钮样式二 -->
+		<div class="prve_next" v-show="showBack">
+			<van-row>
+				<van-col span="12" style="background: #FFFFFF;">
+					<van-row>
+						<van-col offset="4" span="6" style="margin-top: 14px;">
+							<i class="iconfont icon-xxx" style="color: #85B8FD;font-size: 18px;">&#xe617;</i>
+						</van-col>
+						<van-col span="12" style="text-align: left;">
+							<p style="color: #85B8FD;font-size: 14px;">{{"用时:&nbsp;&nbsp;"+parseInt(time/60/1000)+":"+(time%60)/1000}}</p>
+						</van-col>
+					</van-row>
+				</van-col>
+				<van-col span="12" style="">
+					<van-row>
+						<van-col offset="4" span="6" style="margin-top: 11px;text-align: right;">
+							<i class="iconfont icon-xxx" style="color: #FFFFFF;font-size: 22px;">&#xe6cd;</i>
+						</van-col>
+						<van-col span="12" style="text-align: left;margin-left: 10px;">
+							<div @click="go_home">
+								<p style="color: #FFFFFF;font-size: 14px;">回主页</p>
 							</div>
 						</van-col>
 					</van-row>
@@ -201,14 +228,14 @@
 				testname: '',
 				percentage: '',
 				time: 120 * 60 * 1000,
-				showResult: true,
+				showResult: false,
 				showRed:false,
-				showAdd:true
+				showAdd:true,
+				showBack:false,
+				showComit:true
 			}
 		},
 		mounted() {
-			var subject_list = []
-			localStorage.setItem("array", JSON.stringify(subject_list))
 			var name = this.$route.query.name
 			this.testname = name
 			this.getRealTest()
@@ -223,7 +250,7 @@
 					subjectid: this.question[0].id
 				}
 				GetAddcollection(query).then(res => {
-					this.subjectid = res.data.id
+					window.console.log(res)
 					this.$toast("收藏成功！")
 				})
 			},
@@ -266,7 +293,7 @@
 				this.show = false
 				this.checked = ''
 				this.right_key = ''
-				var str_subject_list = JSON.parse(localStorage.getItem("array"))
+				var str_subject_list = JSON.parse(localStorage.getItem("real_array"))
 				for (var i = 0; i < this.question[0].option.length; i++) {
 					this.question[0].option[i].bindclass = "icon-xxx iconfont checkbox"
 				}
@@ -300,10 +327,10 @@
 						"subject_index": index + 1
 					}
 					// 取出localstorage里的数组
-					var str_subject_list = JSON.parse(localStorage.getItem("array"))
+					var str_subject_list = JSON.parse(localStorage.getItem("real_array"))
 					// 如果数组为空，则添加当前选项数据	
 					str_subject_list.push(subjectdata)
-					localStorage.setItem("array", JSON.stringify(str_subject_list))
+					localStorage.setItem("real_array", JSON.stringify(str_subject_list))
 					this.$forceUpdate()
 				}
 			},
@@ -328,7 +355,19 @@
 			},
 			// 提交
 			commit_test() {
-
+				if(this.active == 100){
+					this.$refs.countDown.pause();
+					this.showComit = false
+					this.showBack = true
+				}
+			},
+			// 只看错题
+			show_errow(){
+			
+			},
+			// 回到主页
+			go_home(){
+				this.$router.push({path:"/index"})
 			}
 		}
 	}
