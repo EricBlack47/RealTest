@@ -14,12 +14,12 @@
 							<van-row>
 								<van-col span="8">
 									<div class="list_sub">
-										<p>{{item.times==7200?"未开始":(item.percentage=="100%"?"已考完":"已考"+item.percentage)}}</p>
+										<p>{{item.times==7200000?"未开始":(item.subject_over==true?"已考完":"已考"+item.percentage+"%")}}</p>
 									</div>
 								</van-col>
 								<van-col span="16">
 									<div class="list_sub">
-										<p>{{item.percentage=="100%"?item.rate+"正确率":"剩余时间："}}</p>
+										<p>{{item.percentage=="100%"?item.rate+"正确率":"剩余时间："+parseInt(item.times/60/1000)+":"+((item.times%60)/1000).toFixed(0)}}</p>
 									</div>
 								</van-col>
 							</van-row>
@@ -27,7 +27,7 @@
 					</van-col>
 					<van-col span="4">
 						<div class="go_test" @click="goRealTest(item)">
-							<p>{{item.percentage=="100%"?"重考":"去考试"}}</p>
+							<p>{{item.subject_over==true?"重考":"去考试"}}</p>
 						</div>
 					</van-col>
 				</van-row>
@@ -38,7 +38,8 @@
 
 <script>
 	import {
-		GetRealTestList
+		GetRealTestList,
+		PostRecord
 	} from '@/request/api.js'
 	export default {
 		data() {
@@ -47,7 +48,7 @@
 				userid: '',
 				minutes: 0,
 				seconds: 0,
-				gettime:7200
+				gettime:0
 			}
 		},
 		mounted() {
@@ -70,10 +71,26 @@
 				})
 			},
 			goRealTest(item) {
-				this.$router.push({
-					path: "/RealTest",
-					query:{"name":item.answer}
-				})
+				if(item.subject_over == true){
+					var real_array = JSON.parse(localStorage.getItem("real_array"))
+					var query ={
+						userid:item.userid,
+						answer:item.name,
+						percentage:0,
+						times:120*60*1000,
+						rate:0,
+						cache:real_array,
+						subject_over:false
+					}
+					PostRecord(query).then(res =>{
+						window.console.log(res)
+					})
+				}else{
+					this.$router.push({
+						path: "/RealTest",
+						query:{"name":item.answer}
+					})
+				}
 			}
 		}
 	}

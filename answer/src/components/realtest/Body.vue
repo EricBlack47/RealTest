@@ -27,7 +27,7 @@
 				</van-col>
 				<van-col span="11" v-show="showRed">
 					<van-row>
-						<van-col offset="2" span="6">
+						<van-col offset="4" span="6">
 							<div class="like_icon" @click="show = true">
 								<i class="iconfont icon-xxx" style="color: #83B6FF;">&#xe600;</i>
 							</div>
@@ -78,8 +78,8 @@
 			</van-overlay>
 		</div>
 
-		<!-- 题目 -->
-		<div class="question_body" v-if="question">
+		<!-- 单个题目 -->
+		<div class="question_body" v-if="question" v-show="oneQuestion">
 			<!-- 题目描述 -->
 			<div class="question_text">
 				<p><span><img src="https://jisuanjierji.oss-cn-beijing.aliyuncs.com/sucai/SingleBox.png" /></span>{{active+"、"+question[0].title}}</p>
@@ -103,12 +103,57 @@
 			<div class="test_num">
 				<p>{{'第'+active+'题/共'+limit+'题'}}</p>
 			</div>
-			<!-- 答案解析 -->
-			<!-- <div class="test_desc question_text" v-if="checked!=''" style="margin-bottom: 100px;">
-				<p>试题解析</p>
-				<p>【答案】{{question[0].right_key}}</p>
-				<p>{{question[0].analysis}}</p>
-			</div> -->
+		</div>
+
+		<!-- 题目列表 -->
+		<div class="question_body" v-if="question" v-show="questionList">
+			<div v-for="(item,index) in resultlist" :key="index">
+				<!-- 题目描述 -->
+				<div class="question_text">
+					<p><span><img src="https://jisuanjierji.oss-cn-beijing.aliyuncs.com/sucai/SingleBox.png" /></span>{{(index+1)+"、"+item.title}}</p>
+				</div>
+				<!-- 选项对错 -->
+				<div class="question_text" style="margin-top: 20px;margin-bottom: 40px;">
+					<van-row style="padding: 5px 20px 5px 20px;" v-for="(item2,index2) in item.option" :key="index2">
+						<van-col span="1">
+							<div style="margin-top: 18px;">
+								<i v-bind:class="item2.bindclassss">&#xe622;</i>
+							</div>
+						</van-col>
+						<van-col span="22">
+							<div>
+								<p>{{item2.sorts+'.'+item2.title}}</p>
+							</div>
+						</van-col>
+					</van-row>
+				</div>
+			</div>
+		</div>
+
+
+		<!-- 只看错题 -->
+		<div class="question_body" v-if="question" v-show="onlyerrow">
+			<div v-for="(item,index) in errowlist" :key="index">
+				<!-- 题目描述 -->
+				<div class="question_text">
+					<p><span><img src="https://jisuanjierji.oss-cn-beijing.aliyuncs.com/sucai/SingleBox.png" /></span>{{(index+1)+"、"+item.title}}</p>
+				</div>
+				<!-- 选项对错 -->
+				<div class="question_text" style="margin-top: 20px;margin-bottom: 40px;">
+					<van-row style="padding: 5px 20px 5px 20px;" v-for="(item2,index2) in item.option" :key="index2">
+						<van-col span="1">
+							<div style="margin-top: 18px;">
+								<!-- <i v-bind:class="item2.bindclassss">&#xe622;</i> -->
+							</div>
+						</van-col>
+						<van-col span="22">
+							<div>
+								<p>{{item2.sorts+'.'+item2.title}}</p>
+							</div>
+						</van-col>
+					</van-row>
+				</div>
+			</div>
 		</div>
 		<!-- 底部按钮 -->
 		<div class="prve_next" v-show="showComit">
@@ -136,7 +181,7 @@
 							<i class="iconfont icon-xxx" style="color: #85B8FD;font-size: 18px;">&#xe617;</i>
 						</van-col>
 						<van-col span="14">
-							<van-count-down :time="time" style="font-size: 13px;" format="倒计时:mm:ss" />
+							<van-count-down :time="time" style="font-size: 13px;" format="倒计时:mm:ss" ref="countDown" />
 						</van-col>
 					</van-row>
 				</van-col>
@@ -162,7 +207,7 @@
 							</div>
 						</van-col>
 						<van-col span="8">
-							<div class="add_like" @click="commit_test"  ref="countDown">
+							<div class="add_like" @click="commit_test">
 								<p style="color: #FFFFFF;">交卷</p>
 							</div>
 						</van-col>
@@ -175,11 +220,11 @@
 			<van-row>
 				<van-col span="12" style="background: #FFFFFF;">
 					<van-row>
-						<van-col offset="4" span="6" style="margin-top: 14px;">
+						<van-col offset="2" span="6" style="margin-top: 14px;">
 							<i class="iconfont icon-xxx" style="color: #85B8FD;font-size: 18px;">&#xe617;</i>
 						</van-col>
-						<van-col span="12" style="text-align: left;">
-							<p style="color: #85B8FD;font-size: 14px;">{{"用时:&nbsp;&nbsp;"+parseInt(time/60/1000)+":"+(time%60)/1000}}</p>
+						<van-col span="14" style="text-align: left;">
+							<p style="color: #85B8FD;font-size: 14px;">{{"用时:&nbsp;&nbsp;"+parseInt((7200000-time)/60/1000)+"分钟"}}</p>
 						</van-col>
 					</van-row>
 				</van-col>
@@ -220,19 +265,24 @@
 				finalresult: '',
 				question: '',
 				lists: [],
+				resultlist: [],
+				errowlist: [],
 				userid: '',
 				addid: '',
 				subjectid: 0,
 				title: '',
 				limit: 100,
 				testname: '',
-				percentage: '',
-				time: 120 * 60 * 1000,
+				percentage: 0,
+				time: 7200000,
 				showResult: false,
-				showRed:false,
-				showAdd:true,
-				showBack:false,
-				showComit:true
+				showRed: false,
+				showAdd: true,
+				showBack: false,
+				showComit: true,
+				oneQuestion: true,
+				questionList: false,
+				onlyerrow: false
 			}
 		},
 		mounted() {
@@ -267,8 +317,7 @@
 						this.question[0].option[i].bindclass = "icon-xxx iconfont checkbox"
 					}
 				})
-				var userid = localStorage.getItem("userid")
-				this.userid = userid
+				this.userid = localStorage.getItem("userid")
 			},
 			// 取消收藏
 			changeUnlike() {
@@ -307,6 +356,7 @@
 						}
 					}
 				}
+
 			},
 			// 选择选项
 			selectItem(index) {
@@ -355,19 +405,67 @@
 			},
 			// 提交
 			commit_test() {
-				if(this.active == 100){
+				if (this.active == 100) {
 					this.$refs.countDown.pause();
-					this.showComit = false
-					this.showBack = true
+					this.time = this.$refs.countDown.remain
+					var str_subject_list = JSON.parse(localStorage.getItem("real_array"))
+					if (str_subject_list.length > 0) {
+						this.showComit = false
+						this.showBack = true
+						this.showResult = true
+						this.questionList = true
+						this.oneQuestion = false
+						this.showRed = true
+						this.showAdd = false
+						for (var i = 0; i < str_subject_list.length; i++) {
+							for (var k = 0; k < this.lists.length; k++) {
+								if (this.lists[k][0].id == str_subject_list[i].subject_id) {
+									this.resultlist.push(this.lists[k][0])
+									if (this.lists[k][0].right_key != str_subject_list[i].subject_item) {
+										this.errowlist.push(this.lists[k][0])
+									}
+								}
+							}
+						}
+						for(var j = 0;j<this.resultlist.length;j++){
+							for(var z = 0;z<this.resultlist[i].option.length;z++){
+								this.resultlist[i].option[z].bindclassss = 'icon-xxx iconfont checkbox'
+								if(this.resultlist[i].right_key == this.resultlist[i].option[z].sorts){
+									this.resultlist[i].option[z].bindclassss = 'icon-xxx iconfont checkedbox'
+								}else{
+									this.resultlist[i].option[z].bindclassss = 'icon-xxx iconfont checedfalse'
+									for(var x = 0; x<this.resultlist[i].option.length;x++){
+										if(this.resultlist[i].right_key == this.resultlist[i].option[z].sorts){
+											this.resultlist[i].option[z].bindclassss = 'icon-xxx iconfont checkedbox'
+										}
+									}
+								}
+							}
+						}
+
+					} else {
+						this.$toast("还一题都没有做！")
+						
+					}
+
 				}
 			},
 			// 只看错题
-			show_errow(){
-			
+			show_errow() {
+				
+				window.console.log(this.resultlist)
 			},
 			// 回到主页
-			go_home(){
-				this.$router.push({path:"/index"})
+			go_home() {
+				this.$router.push({
+					path: "/index"
+				})
+			},
+			// 暂停时间
+			stop_time() {
+				this.$refs.countDown.pause();
+				this.time = this.$refs.countDown.remain
+				window.console.log(this.time)
 			}
 		}
 	}
@@ -549,7 +647,8 @@
 		padding: 12px 0;
 		font-size: 12px;
 	}
-	.test_result h2{
+
+	.test_result h2 {
 		padding: 12px 0 42px 0;
 		margin: 0 auto;
 		border-top: 1px solid #E3E3E3;

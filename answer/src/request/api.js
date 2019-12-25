@@ -23,3 +23,5 @@ export const GetCancelcollection=obj=>get('/api/deletcollection',obj)
 export const GetRealTestList=obj=>get('/api/queryrecord',obj)
 // 根据真题名字请求真题
 export const GetRealTest=obj=>get('/api/getquestion',obj)
+// 保存当前题目进度
+export const PostRecord=obj=>postfromdata('/api/addrecord',obj)
