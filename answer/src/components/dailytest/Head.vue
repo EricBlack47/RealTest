@@ -178,7 +178,12 @@
 			localStorage.setItem("array", JSON.stringify(subject_list))
 		},
 		created() {
-			GetDailyTest().then(res => {
+			var userid = localStorage.getItem("userid")
+			this.userid = userid
+			var query = {
+				userid:this.userid
+			}
+			GetDailyTest(query).then(res => {
 				this.lists = res.data
 				this.question = this.lists[0]
 				this.right_key = this.question[0].right_key
@@ -186,8 +191,7 @@
 					this.question[0].option[i].bindclass = "icon-xxx iconfont checkbox"
 				}
 			})
-			var userid = localStorage.getItem("userid")
-			this.userid = userid
+			
 		},
 		methods: {
 			// 收藏

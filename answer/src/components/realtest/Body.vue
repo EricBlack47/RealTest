@@ -169,8 +169,8 @@
 				</div>
 			</div>
 		</div>
-		
-		
+
+
 		<!-- 底部按钮 -->
 		<div class="prve_next" v-show="showComit">
 			<van-row>
@@ -278,8 +278,8 @@
 				liked: false,
 				unlike: true,
 				show: false,
-				selectTest:true,
-				moreTest:false,
+				selectTest: true,
+				moreTest: false,
 				active: 1,
 				right_key: '',
 				checked: '',
@@ -307,7 +307,10 @@
 				onlyerrow: false,
 				lefttime: '',
 				totalTime: 2,
-				testover: false
+				testover: false,
+				collection: false,
+				collectionid: '',
+				localindex: ''
 			}
 		},
 		created() {
@@ -328,28 +331,38 @@
 				}
 				GetAddcollection(query).then(res => {
 					window.console.log(res)
+					this.collectionid = res.data.collectionid
 					this.$toast("收藏成功！")
 				})
 			},
 			// 获取题目
 			getRealTest() {
 				var query = {
-					questionname: this.testname
+					questionname: this.testname,
+					userid: this.userid
 				}
 				GetRealTest(query).then(res => {
 					this.lists = res.data
 					this.question = this.lists[0]
 					this.right_key = this.question[0].right_key
+					this.subjectid = this.question[0].id
 					var str_subject_list = JSON.parse(localStorage.getItem("real_array"))
 					for (var i = 0; i < this.question[0].option.length; i++) {
 						this.question[0].option[i].bindclass = "icon-xxx iconfont checkbox"
 					}
-					if(str_subject_list.length!=0){
+					if (str_subject_list.length != 0) {
 						for (var z = 0; z < this.lists.length; z++) {
 							if (this.lists[z][0].id == str_subject_list[str_subject_list.length - 1].subject_id) {
 								this.selected(z)
 							}
 						}
+					}
+					if (this.question[0].collections == true) {
+						this.unlike = false
+						this.liked = true
+					} else {
+						this.unlike = true
+						this.liked = false
 					}
 					// 返回已做过的题目时，将已选择的选项标上颜色
 					for (var k = 0; k < str_subject_list.length; k++) {
@@ -374,7 +387,7 @@
 				GetRecord(query).then(res => {
 					if (res.data.cache == null) {
 						var empty_array = []
-						localStorage.setItem("real_array",JSON.stringify(empty_array))
+						localStorage.setItem("real_array", JSON.stringify(empty_array))
 					} else {
 						localStorage.setItem("real_array", res.data.cache)
 						this.score = parseInt(res.data.rate)
@@ -388,7 +401,7 @@
 				this.liked = false
 				this.unlike = true
 				var query = {
-					id: this.subjectid
+					collectionid: this.collectionid
 				}
 				GetCancelcollection(query).then(res => {
 					window.console.log(res)
@@ -406,6 +419,13 @@
 				this.show = false
 				this.checked = ''
 				this.right_key = ''
+				if (this.question[0].collections == true) {
+					this.unlike = false
+					this.liked = true
+				} else {
+					this.unlike = true
+					this.liked = false
+				}
 				var str_subject_list = JSON.parse(localStorage.getItem("real_array"))
 				for (var i = 0; i < this.question[0].option.length; i++) {
 					this.question[0].option[i].bindclass = "icon-xxx iconfont checkbox"
@@ -413,6 +433,7 @@
 				// 返回已做过的题目时，将已选择的选项标上颜色
 				for (var k = 0; k < str_subject_list.length; k++) {
 					if (this.question[0].id == str_subject_list[k].subject_id) {
+						this.checked = str_subject_list[k].subject_item
 						for (var j = 0; j < this.question[0].option.length; j++) {
 							if (this.question[0].option[j].sorts == str_subject_list[k].subject_item) {
 								this.question[0].option[j].bindclass = 'icon-xxx iconfont checkedbox'
@@ -424,30 +445,16 @@
 			},
 			// 选择选项
 			selectItem(index) {
-				if (this.checked == '') {
+				for (var i = 0; i < this.question[0].option.length; i++) {
+					this.question[0].option[i].bindclass = "icon-xxx iconfont checkbox"
+					this.checked = this.question[0].option[index].sorts
 					if (this.question[0].right_key == this.question[0].option[index].sorts) {
-						this.score += 1
 						this.question[0].option[index].bindclass = 'icon-xxx iconfont checkedbox'
 					} else {
 						this.question[0].option[index].bindclass = 'icon-xxx iconfont checkedbox'
 					}
-					this.checked = this.question[0].option[index].sorts
-					this.right_key = this.question[0].right_key
-					// 当前选项数据
-					var subjectdata = {
-						"subject_id": this.question[0].id,
-						"subject_item": this.checked,
-						"subject_right": this.right_key,
-						"subject_index": index + 1,
-						"subject_score": this.score
-					}
-					// 取出localstorage里的数组
-					var str_subject_list = JSON.parse(localStorage.getItem("real_array"))
-					// 如果数组为空，则添加当前选项数据	
-					str_subject_list.push(subjectdata)
-					localStorage.setItem("real_array", JSON.stringify(str_subject_list))
-					this.$forceUpdate()
 				}
+				this.$forceUpdate()
 			},
 			// 上一题
 			go_prve() {
@@ -462,7 +469,31 @@
 			// 下一题
 			go_next() {
 				if (this.active < 100) {
+					this.right_key = this.question[0].right_key
 					var next = this.active
+					// 取出localstorage里的数组
+					var str_subject_list = JSON.parse(localStorage.getItem("real_array"))
+					// 当前选项数据
+					var subjectdata = {
+						"subject_id": this.question[0].id,
+						"subject_item": this.checked,
+						"subject_right": this.right_key,
+					}
+					// 如果数组为空，则添加当前选项数据
+					if (str_subject_list.length == 0) {
+						str_subject_list.push(subjectdata)
+					}
+					var pushcode = 0
+					for (var i = 0; i < str_subject_list.length; i++) {
+						if (str_subject_list[i].subject_id == this.question[0].id) {
+							pushcode = 1
+							str_subject_list[i] = subjectdata
+						}
+					}
+					if(pushcode==0){
+						str_subject_list.push(subjectdata)
+					}
+					localStorage.setItem("real_array", JSON.stringify(str_subject_list))
 					this.selected(next)
 				} else {
 					this.$toast("已经是最后一题了！")
@@ -474,7 +505,6 @@
 					this.stop_time()
 					this.time = this.$refs.countDown.remain
 					var str_subject_list = JSON.parse(localStorage.getItem("real_array"))
-					this.score = str_subject_list[str_subject_list.length - 1].subject_score
 					if (str_subject_list.length > 0) {
 						this.showComit = false
 						this.showBack = true
@@ -507,18 +537,26 @@
 								}
 							}
 						}
-						this.testover = true
-						this.$emit('input',this.testover)
-						var query2 ={
-							userid:this.userid,
-							answer:this.name,
-							percentage:str_subject_list.length,
-							times:this.time,
-							rate:this.score+"%",
-							cache:JSON.stringify(str_subject_list),
-							subject_over:true
+						// 计算分数
+						var final = 0
+						for (var x=0;x<str_subject_list.length;x++){
+							if(str_subject_list[x].subject_item == str_subject_list[x].subject_right){
+								final += 1
+							}
 						}
-						PostRecord(query2).then(res =>{
+						this.score = final
+						this.testover = true
+						this.$emit('input', this.testover)
+						var query2 = {
+							userid: this.userid,
+							answer: this.name,
+							percentage: str_subject_list.length,
+							times: this.time,
+							rate: final + "%",
+							cache: JSON.stringify(str_subject_list),
+							subject_over: true
+						}
+						PostRecord(query2).then(res => {
 							window.console.log(res)
 						})
 					}
@@ -557,7 +595,7 @@
 				}, 1000)
 			},
 			// 继续刷题
-			go_more(){
+			go_more() {
 				this.$router.push('/lists')
 			}
 		}
