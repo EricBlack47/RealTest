@@ -25,3 +25,5 @@ export const GetRealTestList=obj=>get('/api/queryrecord',obj)
 export const GetRealTest=obj=>get('/api/getquestion',obj)
 // 保存当前题目进度
 export const PostRecord=obj=>postfromdata('/api/addrecord',obj)
+// 查询当前进度
+export const GetRecord=obj=>get('/api/queryrecords',obj)

@@ -72,6 +72,8 @@
 						this.$toast.clear();
 						this.$toast(res.msg)
 						localStorage.setItem("userid",res.userid)
+						var subject_list = []
+						localStorage.setItem("real_array", JSON.stringify(subject_list))
 						this.$router.push({
 							path: '/index'
 						})

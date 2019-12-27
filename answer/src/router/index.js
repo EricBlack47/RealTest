@@ -8,6 +8,7 @@ import Register from '../views/Register.vue'
 import DailyTest from '../views/DailyTest.vue'
 import Lists from '../views/Lists.vue'
 import RealTest from '../views/RealTest.vue'
+import MyCollection from '../views/MyCollection.vue'
 
 Vue.use(VueRouter)
 
@@ -56,6 +57,11 @@ const routes = [
 		path: '/realtest',
 		name: 'realtest',
 		component: RealTest
+	},
+	{
+		path: '/mycollection',
+		name: 'mycollection',
+		component: MyCollection
 	}
 ]
 

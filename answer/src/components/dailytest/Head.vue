@@ -85,11 +85,11 @@
 				<p>{{'第'+active+'题/共'+limit+'题'}}</p>
 			</div>
 			<!-- 答案解析 -->
-			<div class="test_desc question_text" v-if="checked!=''" style="margin-bottom: 100px;">
+			<!-- <div class="test_desc question_text" v-if="checked!=''" style="margin-bottom: 100px;">
 				<p>试题解析</p>
 				<p>【答案】{{question[0].right_key}}</p>
 				<p>{{question[0].analysis}}</p>
-			</div>
+			</div> -->
 		</div>
 		<!-- 底部按钮 -->
 		<div class="prve_next">
@@ -307,7 +307,9 @@
 						this.question[0].option[i].bindclass = "icon-xxx iconfont checkbox"
 					}
 				})
-				localStorage.clear()
+				var subject_list = []
+				localStorage.setItem("array", JSON.stringify(subject_list))
+				this.selected(0)
 				this.$toast("已经刷新题目！")
 			}
 		}
@@ -483,5 +485,9 @@
 	.test_desc p {
 		font-size: 16px;
 		color: #7AAFFA;
+	}
+	
+	.question_body{
+		margin-bottom: 80px;
 	}
 </style>

@@ -12,14 +12,16 @@
 						<p>真题模拟</p>
 					</van-col>
 				</van-row>
-				<Body :name="name" ref="bodyget"></Body>
+				<Body :name="name" ref="bodyget" v-model="testover"></Body>
 			</div>
 		</Bg2>
 	</div>
 </template>
 
 <script>
-	import {PostRecord} from "@/request/api.js"
+	import {
+		PostRecord
+	} from "@/request/api.js"
 	import Bg2 from "@/components/Bg2.vue"
 	import Body from "@/components/realtest/Body.vue"
 	export default {
@@ -29,7 +31,8 @@
 				activesubjec: [],
 				activecode: 0,
 				name: '',
-				userid:''
+				userid: '',
+				testover: ''
 			}
 		},
 		components: {
@@ -40,30 +43,56 @@
 			var name = this.$route.query.name
 			this.name = name
 			this.userid = localStorage.getItem("userid")
+			this.testover = this.$refs.bodyget.testover
 		},
 		methods: {
 			go_back() {
-				this.$toast.loading({
-					message: '正在保存当前进度...',
-					forbidClick: true,
-					loadingType: 'spinner'
-				});
 				var real_array = JSON.parse(localStorage.getItem("real_array"))
 				this.$refs.bodyget.stop_time()
-				var query ={
-					userid:this.userid,
-					answer:this.name,
-					percentage:real_array.length,
-					times:this.$refs.bodyget.time,
-					rate:this.$refs.bodyget.score+"%",
-					cache:real_array
+				if(this.testover == false){
+					this.$toast.loading({
+						message: '正在保存当前进度...',
+						forbidClick: true,
+						loadingType: 'spinner'
+					});		
+					var query = {
+						userid: this.userid,
+						answer: this.name,
+						percentage: real_array.length,
+						times: this.$refs.bodyget.time,
+						rate: this.$refs.bodyget.score + "%",
+						cache: JSON.stringify(real_array),
+						subject_over:false
+					}
+					PostRecord(query).then(res => {
+						window.console.log(res)
+						this.$toast.clear();
+						this.$router.push('/lists')
+					})
+				}else{
+					this.$toast.loading({
+						message: '正在返回...',
+						forbidClick: true,
+						loadingType: 'spinner'
+					});
+					var query2 = {
+						userid: this.userid,
+						answer: this.name,
+						percentage: real_array.length,
+						times: this.$refs.bodyget.time,
+						rate: this.$refs.bodyget.score + "%",
+						cache: JSON.stringify(real_array),
+						subject_over:true
+					}
+					PostRecord(query2).then(res => {
+						window.console.log(res)
+						this.$toast.clear();
+						var str_subject_list = []
+						localStorage.setItem("real_array", JSON.stringify(str_subject_list))
+						this.$router.push('/lists')
+					})
 				}
-				window.console.log(query)
-				PostRecord(query).then(res =>{
-					window.console.log(res)
-					this.$toast.clear();
-					this.$router.push('/lists')
-				})
+				
 			},
 		}
 	}

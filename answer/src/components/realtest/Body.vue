@@ -43,7 +43,7 @@
 				<van-col span="2">
 					<div class="blue_down_line"></div>
 				</van-col>
-				<van-col span="11">
+				<van-col span="11" v-show="selectTest">
 					<van-row>
 						<van-col offset="2" span="6">
 							<div class="like_icon" @click="show = true">
@@ -53,6 +53,20 @@
 						<van-col span="12">
 							<div class="add_like" @click="show = true">
 								<p style="color: #85B8FD;margin: 10px 0 14px 0;">跳转试题</p>
+							</div>
+						</van-col>
+					</van-row>
+				</van-col>
+				<van-col span="11" v-show="moreTest">
+					<van-row>
+						<van-col offset="2" span="6">
+							<div class="like_icon">
+								<i class="iconfont icon-xxx" style="color: #83B6FF;">&#xe650;</i>
+							</div>
+						</van-col>
+						<van-col span="12">
+							<div class="add_like" @click="go_more">
+								<p style="color: #85B8FD;margin: 10px 0 14px 0;">继续刷题</p>
 							</div>
 						</van-col>
 					</van-row>
@@ -143,7 +157,7 @@
 					<van-row style="padding: 5px 20px 5px 20px;" v-for="(item2,index2) in item.option" :key="index2">
 						<van-col span="1">
 							<div style="margin-top: 18px;">
-								<!-- <i v-bind:class="item2.bindclassss">&#xe622;</i> -->
+								<i v-bind:class="item2.bindclassss">&#xe622;</i>
 							</div>
 						</van-col>
 						<van-col span="22">
@@ -155,6 +169,8 @@
 				</div>
 			</div>
 		</div>
+		
+		
 		<!-- 底部按钮 -->
 		<div class="prve_next" v-show="showComit">
 			<van-row>
@@ -181,7 +197,7 @@
 							<i class="iconfont icon-xxx" style="color: #85B8FD;font-size: 18px;">&#xe617;</i>
 						</van-col>
 						<van-col span="14">
-							<van-count-down :time="time" style="font-size: 13px;" format="倒计时:mm:ss" ref="countDown" />
+							<van-count-down :time="time" style="font-size: 13px;" format="倒计时:mm:ss" ref="countDown" @finish="finish" />
 						</van-col>
 					</van-row>
 				</van-col>
@@ -199,7 +215,7 @@
 						</van-col>
 					</van-row>
 				</van-col>
-				<van-col span="7" v-if="active==100">
+				<van-col span="7" v-if="active==100" @click="commit_test">
 					<van-row>
 						<van-col offset="4" span="6">
 							<div class="like_icon">
@@ -207,7 +223,7 @@
 							</div>
 						</van-col>
 						<van-col span="8">
-							<div class="add_like" @click="commit_test">
+							<div class="add_like">
 								<p style="color: #FFFFFF;">交卷</p>
 							</div>
 						</van-col>
@@ -224,7 +240,9 @@
 							<i class="iconfont icon-xxx" style="color: #85B8FD;font-size: 18px;">&#xe617;</i>
 						</van-col>
 						<van-col span="14" style="text-align: left;">
-							<p style="color: #85B8FD;font-size: 14px;">{{"用时:&nbsp;&nbsp;"+parseInt((7200000-time)/60/1000)+"分钟"}}</p>
+							<p style="color: #85B8FD;font-size: 14px;">
+								<van-count-down :time="(7200000-lefttime)" style="font-size: 13px;padding: 0 0;" format="用时:mm:ss" :auto-start="false" />
+							</p>
 						</van-col>
 					</van-row>
 				</van-col>
@@ -249,7 +267,9 @@
 	import {
 		GetRealTest,
 		GetAddcollection,
-		GetCancelcollection
+		GetCancelcollection,
+		GetRecord,
+		PostRecord
 	} from '@/request/api.js'
 	export default {
 		props: ['name'],
@@ -258,6 +278,8 @@
 				liked: false,
 				unlike: true,
 				show: false,
+				selectTest:true,
+				moreTest:false,
 				active: 1,
 				right_key: '',
 				checked: '',
@@ -282,12 +304,17 @@
 				showComit: true,
 				oneQuestion: true,
 				questionList: false,
-				onlyerrow: false
+				onlyerrow: false,
+				lefttime: '',
+				totalTime: 2,
+				testover: false
 			}
 		},
-		mounted() {
+		created() {
 			var name = this.$route.query.name
+			this.userid = localStorage.getItem("userid")
 			this.testname = name
+			this.getRecord()
 			this.getRealTest()
 		},
 		methods: {
@@ -313,11 +340,48 @@
 					this.lists = res.data
 					this.question = this.lists[0]
 					this.right_key = this.question[0].right_key
+					var str_subject_list = JSON.parse(localStorage.getItem("real_array"))
 					for (var i = 0; i < this.question[0].option.length; i++) {
 						this.question[0].option[i].bindclass = "icon-xxx iconfont checkbox"
 					}
+					if(str_subject_list.length!=0){
+						for (var z = 0; z < this.lists.length; z++) {
+							if (this.lists[z][0].id == str_subject_list[str_subject_list.length - 1].subject_id) {
+								this.selected(z)
+							}
+						}
+					}
+					// 返回已做过的题目时，将已选择的选项标上颜色
+					for (var k = 0; k < str_subject_list.length; k++) {
+						if (this.question[0].id == str_subject_list[k].subject_id) {
+							for (var j = 0; j < this.question[0].option.length; j++) {
+								if (this.question[0].option[j].sorts == str_subject_list[k].subject_item) {
+									this.question[0].option[j].bindclass = 'icon-xxx iconfont checkedbox'
+								}
+							}
+						}
+					}
+
 				})
-				this.userid = localStorage.getItem("userid")
+
+			},
+			// 获取缓存
+			getRecord() {
+				var query = {
+					userid: this.userid,
+					answers: this.testname
+				}
+				GetRecord(query).then(res => {
+					if (res.data.cache == null) {
+						var empty_array = []
+						localStorage.setItem("real_array",JSON.stringify(empty_array))
+					} else {
+						localStorage.setItem("real_array", res.data.cache)
+						this.score = parseInt(res.data.rate)
+						this.time = res.data.times
+					}
+				})
+
 			},
 			// 取消收藏
 			changeUnlike() {
@@ -374,7 +438,8 @@
 						"subject_id": this.question[0].id,
 						"subject_item": this.checked,
 						"subject_right": this.right_key,
-						"subject_index": index + 1
+						"subject_index": index + 1,
+						"subject_score": this.score
 					}
 					// 取出localstorage里的数组
 					var str_subject_list = JSON.parse(localStorage.getItem("real_array"))
@@ -405,10 +470,11 @@
 			},
 			// 提交
 			commit_test() {
-				if (this.active == 100) {
-					this.$refs.countDown.pause();
+				if (this.active == 100 || this.lefttime == 0) {
+					this.stop_time()
 					this.time = this.$refs.countDown.remain
 					var str_subject_list = JSON.parse(localStorage.getItem("real_array"))
+					this.score = str_subject_list[str_subject_list.length - 1].subject_score
 					if (str_subject_list.length > 0) {
 						this.showComit = false
 						this.showBack = true
@@ -417,6 +483,8 @@
 						this.oneQuestion = false
 						this.showRed = true
 						this.showAdd = false
+						this.moreTest = true
+						this.selectTest = false
 						for (var i = 0; i < str_subject_list.length; i++) {
 							for (var k = 0; k < this.lists.length; k++) {
 								if (this.lists[k][0].id == str_subject_list[i].subject_id) {
@@ -427,33 +495,42 @@
 								}
 							}
 						}
-						for(var j = 0;j<this.resultlist.length;j++){
-							for(var z = 0;z<this.resultlist[i].option.length;z++){
-								this.resultlist[i].option[z].bindclassss = 'icon-xxx iconfont checkbox'
-								if(this.resultlist[i].right_key == this.resultlist[i].option[z].sorts){
-									this.resultlist[i].option[z].bindclassss = 'icon-xxx iconfont checkedbox'
-								}else{
-									this.resultlist[i].option[z].bindclassss = 'icon-xxx iconfont checedfalse'
-									for(var x = 0; x<this.resultlist[i].option.length;x++){
-										if(this.resultlist[i].right_key == this.resultlist[i].option[z].sorts){
-											this.resultlist[i].option[z].bindclassss = 'icon-xxx iconfont checkedbox'
-										}
+						for (var j = 0; j < this.resultlist.length; j++) {
+							for (var z = 0; z < this.resultlist[j].option.length; z++) {
+								this.resultlist[j].option[z].bindclassss = 'icon-xxx iconfont checkbox'
+								if (this.resultlist[j].right_key == this.resultlist[j].option[z].sorts) {
+									this.resultlist[j].option[z].bindclassss = 'icon-xxx iconfont checkedbox'
+								} else {
+									if (this.resultlist[j].option[z].sorts == str_subject_list[j].subject_item) {
+										this.resultlist[j].option[z].bindclassss = 'icon-xxx iconfont checedfalse'
 									}
 								}
 							}
 						}
-
-					} else {
-						this.$toast("还一题都没有做！")
-						
+						this.testover = true
+						this.$emit('input',this.testover)
+						var query2 ={
+							userid:this.userid,
+							answer:this.name,
+							percentage:str_subject_list.length,
+							times:this.time,
+							rate:this.score+"%",
+							cache:JSON.stringify(str_subject_list),
+							subject_over:true
+						}
+						PostRecord(query2).then(res =>{
+							window.console.log(res)
+						})
 					}
+				} else {
+					this.$toast("还一题都没有做！")
 
 				}
 			},
 			// 只看错题
 			show_errow() {
-				
-				window.console.log(this.resultlist)
+				this.onlyerrow = true;
+				this.questionList = false
 			},
 			// 回到主页
 			go_home() {
@@ -465,7 +542,23 @@
 			stop_time() {
 				this.$refs.countDown.pause();
 				this.time = this.$refs.countDown.remain
-				window.console.log(this.time)
+				this.lefttime = this.$refs.countDown.remain
+			},
+			// 时间到
+			finish() {
+				this.$toast('时间到，即将自动交卷');
+				let clock = window.setInterval(() => {
+					this.totalTime--
+					//当倒计时等于0时清除定时器跳转
+					if (this.totalTime == 0) {
+						window.clearInterval(clock)
+						this.commit_test()
+					}
+				}, 1000)
+			},
+			// 继续刷题
+			go_more(){
+				this.$router.push('/lists')
 			}
 		}
 	}
