@@ -45,19 +45,17 @@
 				</van-col>
 			</van-row>
 			<!-- 跳转弹出窗 -->
-			<van-overlay :show="show">
-				<div class="wrapper" @click.stop>
-					<div class="block">
-						<div class="num_list" v-for="(item,index) in lists" :key="index">
-							<span class="num" @click="selected(index)" :class="active==index+1?'blueNum':'num'">{{index+1}}</span>
-						</div>
-						<div style="clear: both;"></div>
+			<div style="height: 100vh;background-color: rgba(0,0,0,0.5);position: absolute;top: 0;left: 0;width: 100%;margin: 0 auto;z-index: 10;overflow: hidden;" v-show="show">
+				<div style="background-color: white;width: 92%;height: 260px;overflow: scroll;margin: 80px auto;border-radius: 5px;">
+					<div class="num_list" v-for="(item,index) in lists" :key="index">
+						<span class="num" @click="selected(index)" :class="active==index+1?'blueNum':'num'">{{index+1}}</span>
 					</div>
-					<div style="margin-top: 20px;" @click="show = false">
+					<div style="clear: both;"></div>
+					<div style="position: absolute;margin: 0 auto;margin-top: -150px;margin-left:150px;" @click="show = false">
 						<i class="iconfont icon-xxx" style="color:#FFFFFF;font-size: 40px;">&#xe615;</i>
 					</div>
 				</div>
-			</van-overlay>
+			</div>
 		</div>
 		<!-- 题目 -->
 		<div class="question_body" v-if="question">
@@ -151,7 +149,8 @@
 	import {
 		GetDailyTest,
 		GetAddcollection,
-		GetCancelcollection
+		GetCancelcollection,
+		GetAddErrow
 	} from '@/request/api.js'
 	export default {
 		data() {
@@ -210,9 +209,15 @@
 					subjectid: this.question[0].id,
 					option: this.checked
 				}
+				var query2 = {
+					userid: this.userid,
+					subjectid: this.question[0].id
+				}
+				var collection_list = JSON.parse(localStorage.getItem("collection_array"))
 				GetAddcollection(query).then(res => {
-					window.console.log(res)
-					this.subjectid = res.data.id
+					this.subjectid = res.data.collectionid
+					collection_list.push(query2)
+					localStorage.setItem("collection_array", JSON.stringify(collection_list))
 					this.$toast("收藏成功！")
 				})
 			},
@@ -221,11 +226,20 @@
 				this.liked = false
 				this.unlike = true
 				var query = {
-					id: this.subjectid
+					collectionid: this.subjectid
+				}
+				var collection_list = JSON.parse(localStorage.getItem("collection_array"))
+				for (var i = 0; i < collection_list.length; i++) {
+					if (this.question[0].id == collection_list[i].subjectid) {
+						collection_list[i] = ''
+					}
 				}
 				GetCancelcollection(query).then(res => {
-					window.console.log(res)
-					this.$toast("取消收藏成功！")
+					if (res.code == 200) {
+						window.console.log(res)
+						localStorage.setItem("collection_array", JSON.stringify(collection_list))
+						this.$toast("取消收藏成功！")
+					}
 				})
 			},
 			// 显示弹出窗
@@ -234,7 +248,6 @@
 			},
 			// 跳转题目
 			selected(index) {
-				window.console.log(1)
 				this.active = index + 1
 				this.question = this.lists[index]
 				this.show = false
@@ -260,13 +273,22 @@
 						}
 					}
 				}
-				if (this.question[0].collections == true) {
+				var collection_code = 0
+				// 显示缓存已收藏题目
+				var collection_list = JSON.parse(localStorage.getItem("collection_array"))
+				for (var z = 0; z < collection_list.length; z++) {
+					if (this.question[0].id == collection_list[z].subjectid) {
+						collection_code = 1
+					}
+				}
+				if (collection_code == 1) {
 					this.unlike = false
 					this.liked = true
 				} else {
 					this.unlike = true
 					this.liked = false
 				}
+
 			},
 			// 选择选项
 			selectItem(index) {
@@ -275,6 +297,14 @@
 						this.question[0].option[index].bindclass = 'icon-xxx iconfont checkedbox'
 					} else {
 						this.question[0].option[index].bindclass = 'icon-xxx iconfont checedfalse'
+						var query = {
+							userid: this.userid,
+							subjectid: this.question[0].id,
+							option: this.question[0].option[index].sorts
+						}
+						GetAddErrow(query).then(res => {
+							window.console.log(res)
+						})
 						for (var i = 0; i < this.question[0].option.length; i++) {
 							if (this.question[0].option[i].sorts == this.question[0].right_key) {
 								this.question[0].option[i].bindclass = 'icon-xxx iconfont checkedbox'
@@ -391,7 +421,6 @@
 	.wrapper {
 		display: block;
 		justify-content: center;
-		height: 100%;
 		margin-top: 130px;
 		z-index: 10;
 	}
@@ -401,9 +430,8 @@
 		height: 260px;
 		background-color: #fff;
 		margin: 0 auto;
-		overflow-y: scroll;
-		overflow: hidden scroll;
-		
+		overflow: hidden;
+		overflow: scroll;
 	}
 
 	.num {
@@ -418,6 +446,8 @@
 		color: #C1C1C1;
 		margin: 15px 12px 15px 14px;
 		float: left;
+
+
 	}
 
 	.blueNum {

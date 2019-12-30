@@ -74,8 +74,10 @@
 						localStorage.setItem("userid",res.userid)
 						var subject_list = []
 						localStorage.setItem("real_array", JSON.stringify(subject_list))
+						var collection_list = []
+						localStorage.setItem("collection_array", JSON.stringify(collection_list))
 						this.$router.push({
-							path: '/index'
+							path: '/'
 						})
 					}
 				})

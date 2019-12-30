@@ -44,6 +44,10 @@
 			this.name = name
 			this.userid = localStorage.getItem("userid")
 			this.testover = this.$refs.bodyget.testover
+			var userid = localStorage.getItem("userid")
+			if(!userid){
+				this.$router.push("/login")
+			}
 		},
 		methods: {
 			go_back() {

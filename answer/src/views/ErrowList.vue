@@ -8,7 +8,7 @@
 					</div>
 				</van-col>
 				<van-col span="16" class="title">
-					<p>我的收藏</p>
+					<p>错题本</p>
 				</van-col>
 				<van-col span="4">
 					<div class="title" @click="confige" v-show="edit">
@@ -50,8 +50,8 @@
 
 <script>
 	import {
-		GetCollection,
-		GetCancelcollection
+		GetErrowList,
+		GetdelErrow
 	} from '@/request/api.js'
 	import Bg3 from "@/components/Bg3.vue"
 	export default {
@@ -72,7 +72,7 @@
 		},
 		created() {
 			this.userid = localStorage.getItem("userid")
-			this.getCollection()
+			this.getErrow()
 			var userid = localStorage.getItem("userid")
 			if(!userid){
 				this.$router.push("/login")
@@ -80,11 +80,11 @@
 		},
 		methods: {
 			// 获取收藏列表
-			getCollection() {
+			getErrow() {
 				var query = {
 					userid: this.userid
 				}
-				GetCollection(query).then(res => {
+				GetErrowList(query).then(res => {
 					this.lists = res.data
 					for (var i = 0; i < this.lists.length; i++) {
 						this.lists[i].bindclass = 'question_text'
@@ -112,12 +112,13 @@
 			},
 			// 选中题目
 			selected(index) {
+				window.console.log(index)
 				if (this.selectedlists.length == 0) {
 					this.selectedlists.push(this.lists[index])
 				}
 				var pushcode = 0
 				for (var i = 0; i < this.selectedlists.length; i++) {
-					if (this.lists[index].collectionid == this.selectedlists[i].collectionid) {
+					if (this.lists[index].errorid == this.selectedlists[i].errorid) {
 						pushcode = 1
 						this.lists[index].bindclass = 'question_text'
 						this.selectedlists[i] = ""
@@ -131,7 +132,7 @@
 			},
 			// 跳转题目详情
 			gotodetail(item) {
-				this.$router.push({path:"/questiondetail",query:{subjectid:item.subjectid,userid:this.userid}})
+				this.$router.push({path:"/questiondetail2",query:{subjectid:item.subjectid,userid:this.userid}})
 			},
 			// 全选
 			selecteall() {
@@ -160,12 +161,12 @@
 				for (var i = 0; i < this.selectedlists.length; i++) {
 					if(this.selectedlists[i] != ""){
 						var query = {
-							collectionid: this.selectedlists[i].collectionid
+							errorid: this.selectedlists[i].errorid
 						}
-						GetCancelcollection(query).then(res => {
+						GetdelErrow(query).then(res => {
 							window.console.log(res)
-							this.$toast("取消收藏成功！")
-							this.getCollection()
+							this.$toast("移除成功！")
+							this.getErrow()
 						})
 					}	
 				}

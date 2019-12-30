@@ -29,3 +29,10 @@ export const PostRecord=obj=>postfromdata('/api/addrecord',obj)
 export const GetRecord=obj=>get('/api/queryrecords',obj)
 // 查询收藏列表
 export const GetCollection=obj=>get('/api/querycollection',obj)
+// 查询错题列表
+export const GetErrowList=obj=>get('/api/queryerrsubject',obj)
+// 添加错题
+export const GetAddErrow=obj=>get('/api/adderrsubject',obj)
+// 删除错题
+export const GetdelErrow=obj=>get('/api/deleterrsubject',obj)
+

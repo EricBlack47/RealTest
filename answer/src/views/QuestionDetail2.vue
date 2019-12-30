@@ -10,7 +10,7 @@
 						</div>
 					</van-col>
 					<van-col span="16" class="title">
-						<p>我的收藏</p>
+						<p>我的错题</p>
 					</van-col>
 				</van-row>
 				<Head></Head>
@@ -108,8 +108,8 @@
 
 <script>
 	import {
-		GetCollection,
-		GetCancelcollection
+		GetErrowList,
+		GetdelErrow
 	} from '@/request/api.js'
 	import Bg2 from "@/components/Bg2.vue"
 	export default {
@@ -138,29 +138,30 @@
 		},
 		methods: {
 			go_back() {
-				this.$router.push("/mycollection")
+				this.$router.push("/errowlist")
 			},
-			// 获取收藏列表
+			// 获取列表
 			getCollection() {
 				var query = {
 					userid: this.userid
 				}
-				GetCollection(query).then(res => {
-					if(res.code ==200){
+				GetErrowList(query).then(res => {
+					if(res.code == 200){
 						this.lists = res.data
 						for (var i = 0; i < this.lists.length; i++) {
 							for (var k = 0; k < this.lists[i].options.length; k++) {
 								this.lists[i].options[k].bindclass = "icon-xxx iconfont checkbox"
-								for (var z = 0; z < this.lists[i].options.length; z++) {
-									if (this.lists[i].options[z].sort == this.lists[i].right_key) {
-										this.lists[i].options[z].bindclass = "icon-xxx iconfont checkedbox"
-									}
+								if (this.lists[i].options[k].sort == this.lists[i].right_key) {
+									this.lists[i].options[k].bindclass = "icon-xxx iconfont checkedbox"
+								}
+								if (this.lists[i].options[k].sort == this.lists[i].option) {
+									this.lists[i].options[k].bindclass = "icon-xxx iconfont checedfalse"
 								}
 							}
 						}
 						this.getQuestion()
 					}else{
-						this.$toast("系统繁忙！请刷新页面重试！")
+						this.$toast("系统繁忙！请刷新再试")
 					}
 					
 				})
@@ -177,17 +178,15 @@
 			// 移除
 			cancelcollection() {
 				var query = {
-					collectionid: this.question.collectionid
+					errorid: this.question.errorid
 				}
-				GetCancelcollection(query).then(res => {
-					window.console.log(res)
+				GetdelErrow(query).then(res => {
 					if(res.code == 200){
-						this.$toast("取消收藏成功！")
+						this.$toast("移除成功！")
 						this.getCollection()
 					}else{
-						this.$toast("系统繁忙！请稍后再试！")
+						this.$toast("系统繁忙！请刷新再试")
 					}
-					
 				})
 			},
 			// 跳转题目
@@ -201,22 +200,25 @@
 						if (this.question.options[k].sort == this.question.right_key) {
 							this.question.options[k].bindclass = "icon-xxx iconfont checkedbox"
 						}
+						if (this.question.options[k].sort == this.question.option) {
+							this.question.options[k].bindclass = "icon-xxx iconfont checedfalse"
+						}
 					}
 				}
 			},
 			// 上一题
 			prve() {
-				if(this.active+1 == 1){
+				if (this.active + 1 == 1) {
 					this.$toast("已经是第一题了！")
 					return
-				}else{
+				} else {
 					var prve = this.active - 1
 					this.selected(prve)
 				}
 			},
 			// 下一题
 			next() {
-				if (this.active < this.lists.length-1) {
+				if (this.active < this.lists.length - 1) {
 					var next = this.active + 1
 					this.selected(next)
 				} else {

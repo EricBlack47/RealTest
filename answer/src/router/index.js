@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
-import Test from '../views/testss.vue'
 import Index from '../views/Index.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
@@ -10,29 +9,22 @@ import Lists from '../views/Lists.vue'
 import RealTest from '../views/RealTest.vue'
 import MyCollection from '../views/MyCollection.vue'
 import QuestionDetail from '../views/QuestionDetail.vue'
+import QuestionDetail2 from '../views/QuestionDetail2.vue'
+import ErrowList from '../views/ErrowList.vue'
+
 
 Vue.use(VueRouter)
 
 const routes = [
 	{
 		path: '/',
-		name: 'login',
-		component: Login
-	},
-	{
-		path: '/test',
-		name: 'test',
-		component: Test
+		name: 'index',
+		component: Index
 	},
 	{
 		path: '/extension',
 		name: 'home',
 		component: Home
-	},
-	{
-		path: '/index',
-		name: 'index',
-		component: Index
 	},
 	{
 		path: '/login',
@@ -68,6 +60,16 @@ const routes = [
 		path: '/questiondetail',
 		name: 'questiondetail',
 		component: QuestionDetail
+	},
+	{
+		path: '/questiondetail2',
+		name: 'questiondetail2',
+		component: QuestionDetail2
+	},
+	{
+		path: '/errowlist',
+		name: 'ErrowList',
+		component: ErrowList
 	}
 ]
 

@@ -33,9 +33,15 @@
 			Bg2,
 			Head
 		},
+		created() {
+			var userid = localStorage.getItem("userid")
+			if(!userid){
+				this.$router.push("/login")
+			}
+		},
 		methods: {
 			go_back() {
-				this.$router.push('/index')
+				this.$router.push('/')
 			},
 			last() {
 				if (this.activecode == 0) {

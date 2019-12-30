@@ -24,9 +24,15 @@
 			Bg3,
 			SecondList
 		},
+		created() {
+			var userid = localStorage.getItem("userid")
+			if(!userid){
+				this.$router.push("/login")
+			}
+		},
 		methods:{
 			go_back() {
-				this.$router.push('/index')
+				this.$router.push('/')
 			},
 		}
 		

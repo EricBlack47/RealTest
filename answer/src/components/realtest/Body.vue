@@ -77,19 +77,17 @@
 				<h2>{{"正确率:&nbsp;&nbsp;"+score+"&nbsp;%"}}</h2>
 			</div>
 			<!-- 跳转弹出窗 -->
-			<van-overlay :show="show">
-				<div class="wrapper" @click.stop>
-					<div class="block">
-						<div class="num_list" v-for="(item,index) in lists" :key="index">
-							<span class="num" @click="selected(index)" :class="active==index+1?'blueNum':'num'">{{index+1}}</span>
-						</div>
-						<div style="clear: both;"></div>
+			<div style="height: 100vh;background-color: rgba(0,0,0,0.5);position: absolute;top: 0;left: 0;width: 100%;margin: 0 auto;z-index: 10;overflow: hidden;" v-show="show">
+				<div style="background-color: white;width: 92%;height: 260px;overflow: scroll;margin: 80px auto;border-radius: 5px;">
+					<div class="num_list" v-for="(item,index) in lists" :key="index">
+						<span class="num" @click="selected(index)" :class="active==index+1?'blueNum':'num'">{{index+1}}</span>
 					</div>
-					<div style="margin-top: 20px;" @click="show = false">
+					<div style="clear: both;"></div>
+					<div style="position: absolute;top: 0;margin-top: 370px;margin-left: 150px;" @click="show = false">
 						<i class="iconfont icon-xxx" style="color:#FFFFFF;font-size: 40px;">&#xe615;</i>
 					</div>
 				</div>
-			</van-overlay>
+			</div>
 		</div>
 
 		<!-- 单个题目 -->
@@ -269,7 +267,8 @@
 		GetAddcollection,
 		GetCancelcollection,
 		GetRecord,
-		PostRecord
+		PostRecord,
+		GetAddErrow
 	} from '@/request/api.js'
 	export default {
 		props: ['name'],
@@ -327,12 +326,40 @@
 				this.unlike = false
 				var query = {
 					userid: this.userid,
+					subjectid: this.question[0].id,
+					option: this.checked
+				}
+				var query2 = {
+					userid: this.userid,
 					subjectid: this.question[0].id
 				}
+				var collection_list = JSON.parse(localStorage.getItem("collection_array"))	
 				GetAddcollection(query).then(res => {
-					window.console.log(res)
-					this.collectionid = res.data.collectionid
+					this.subjectid = res.data.collectionid
+					collection_list.push(query2)	
+					localStorage.setItem("collection_array", JSON.stringify(collection_list))
 					this.$toast("收藏成功！")
+				})
+			},
+			// 取消收藏
+			changeUnlike() {
+				this.liked = false
+				this.unlike = true
+				var query = {
+					collectionid: this.subjectid
+				}
+				var collection_list = JSON.parse(localStorage.getItem("collection_array"))
+				for(var i = 0 ;i<collection_list.length;i++){
+					if(this.question[0].id == collection_list[i].subjectid ){
+						collection_list[i] = ''
+					}
+				}
+				GetCancelcollection(query).then(res => {
+					if(res.code == 200){
+						window.console.log(res)
+						localStorage.setItem("collection_array", JSON.stringify(collection_list))
+						this.$toast("取消收藏成功！")
+					}
 				})
 			},
 			// 获取题目
@@ -347,6 +374,7 @@
 					this.right_key = this.question[0].right_key
 					this.subjectid = this.question[0].id
 					var str_subject_list = JSON.parse(localStorage.getItem("real_array"))
+					var collection_list = JSON.parse(localStorage.getItem("collection_array"))
 					for (var i = 0; i < this.question[0].option.length; i++) {
 						this.question[0].option[i].bindclass = "icon-xxx iconfont checkbox"
 					}
@@ -374,7 +402,15 @@
 							}
 						}
 					}
-
+					// 添加缓存
+					if(this.question[0].collections == true){
+						var query3 ={
+							userid: this.userid,
+							subjectid: this.question[0].id
+						}
+						collection_list.push(query3)
+					}	
+					localStorage.setItem("collection_array", JSON.stringify(collection_list))
 				})
 
 			},
@@ -396,18 +432,7 @@
 				})
 
 			},
-			// 取消收藏
-			changeUnlike() {
-				this.liked = false
-				this.unlike = true
-				var query = {
-					collectionid: this.collectionid
-				}
-				GetCancelcollection(query).then(res => {
-					window.console.log(res)
-					this.$toast("取消收藏成功！")
-				})
-			},
+			
 			// 显示弹出窗
 			showList() {
 				this.show = true
@@ -419,13 +444,6 @@
 				this.show = false
 				this.checked = ''
 				this.right_key = ''
-				if (this.question[0].collections == true) {
-					this.unlike = false
-					this.liked = true
-				} else {
-					this.unlike = true
-					this.liked = false
-				}
 				var str_subject_list = JSON.parse(localStorage.getItem("real_array"))
 				for (var i = 0; i < this.question[0].option.length; i++) {
 					this.question[0].option[i].bindclass = "icon-xxx iconfont checkbox"
@@ -440,6 +458,21 @@
 							}
 						}
 					}
+				}
+				var collection_code = 0
+				// 显示缓存已收藏题目
+				var collection_list = JSON.parse(localStorage.getItem("collection_array"))
+				for (var z = 0; z < collection_list.length; z++) {
+					if (this.question[0].id == collection_list[z].subjectid) {
+						collection_code = 1
+					}
+				}
+				if (collection_code == 1) {
+					this.unlike = false
+					this.liked = true
+				} else {
+					this.unlike = true
+					this.liked = false
 				}
 
 			},
@@ -479,21 +512,25 @@
 						"subject_item": this.checked,
 						"subject_right": this.right_key,
 					}
-					// 如果数组为空，则添加当前选项数据
-					if (str_subject_list.length == 0) {
-						str_subject_list.push(subjectdata)
-					}
-					var pushcode = 0
-					for (var i = 0; i < str_subject_list.length; i++) {
-						if (str_subject_list[i].subject_id == this.question[0].id) {
-							pushcode = 1
-							str_subject_list[i] = subjectdata
+					// 如果选择了选项
+					if(this.checked != ''){
+						// 如果数组为空，则添加当前选项数据
+						if (str_subject_list.length == 0) {
+							str_subject_list.push(subjectdata)
 						}
+						var pushcode = 0
+						for (var i = 0; i < str_subject_list.length; i++) {
+							if (str_subject_list[i].subject_id == this.question[0].id) {
+								pushcode = 1
+								str_subject_list[i] = subjectdata
+							}
+						}
+						if(pushcode==0){
+							str_subject_list.push(subjectdata)
+						}
+						localStorage.setItem("real_array", JSON.stringify(str_subject_list))
 					}
-					if(pushcode==0){
-						str_subject_list.push(subjectdata)
-					}
-					localStorage.setItem("real_array", JSON.stringify(str_subject_list))
+					
 					this.selected(next)
 				} else {
 					this.$toast("已经是最后一题了！")
@@ -544,6 +581,19 @@
 								final += 1
 							}
 						}
+						// 收集错题
+						for(var b = 0;b<str_subject_list.length;b++){
+							if(str_subject_list[b].subject_item != str_subject_list[b].subject_right){
+								var query = {
+									userid:this.userid,
+									subjectid:str_subject_list[b].subject_id,
+									option:str_subject_list[b].subject_item
+								}
+								GetAddErrow(query).then(res =>{
+									window.console.log(res)
+								})
+							}
+						}
 						this.score = final
 						this.testover = true
 						this.$emit('input', this.testover)
@@ -573,7 +623,7 @@
 			// 回到主页
 			go_home() {
 				this.$router.push({
-					path: "/index"
+					path: "/"
 				})
 			},
 			// 暂停时间
@@ -765,7 +815,7 @@
 		bottom: 0;
 		width: 100%;
 		height: 43.5px;
-		z-index: 10;
+		z-index: 1;
 		background: #85B8FD;
 		box-shadow: 0px -1.5px 2px -0.5px rgba(133, 184, 253, 0.4);
 	}

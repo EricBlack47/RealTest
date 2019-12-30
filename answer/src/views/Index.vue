@@ -58,7 +58,7 @@
 							</van-col>
 							<!-- 错题本 -->
 							<van-col span="24" style="margin-top: -7px;">
-								<router-link to="/test">
+								<router-link to="/errowlist">
 									<img :src="errow" width="100%" />
 								</router-link>
 							</van-col>
@@ -85,6 +85,12 @@
 		},
 		components: {
 			Bg1
+		},
+		created() {
+			var userid = localStorage.getItem("userid")
+			if(!userid){
+				this.$router.push("/login")
+			}
 		}
 	}
 </script>
