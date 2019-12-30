@@ -18,7 +18,7 @@
 			<div class="head_bg">
 				<van-row>
 					<!-- 上一题 -->
-					<van-col span="7">
+					<van-col span="7" @click="prve">
 						<van-row>
 							<van-col offset="4" span="6">
 								<!-- 上一题图标 -->
@@ -47,7 +47,7 @@
 								</div>
 							</van-col>
 							<van-col span="16">
-								<div class="add_like">
+								<div class="add_like" @click="cancelcollection">
 									<p>移除此题</p>
 								</div>
 							</van-col>
@@ -58,7 +58,7 @@
 						<div class="blue_down_line"></div>
 					</van-col>
 					<!-- 下一题 -->
-					<van-col span="7">
+					<van-col span="7" @click="next">
 						<van-row>
 							<van-col offset="4" span="6">
 								<div class="like_icon">
@@ -78,11 +78,11 @@
 			<div class="question_body">
 				<!-- 题目描述 -->
 				<div class="question_text">
-					<p><span><img src="https://jisuanjierji.oss-cn-beijing.aliyuncs.com/sucai/SingleBox.png" /></span>{{active+"、"+lists[0].title}}</p>
+					<p><span><img src="https://jisuanjierji.oss-cn-beijing.aliyuncs.com/sucai/SingleBox.png" /></span>{{active+1+"、"+lists[active].title}}</p>
 				</div>
 				<!-- 选项对错 -->
 				<div class="question_text" style="margin-top: 20px;">
-					<van-row style="padding: 5px 20px 5px 20px;" v-for="(item,index) in lists[0].option" :key="index">
+					<van-row style="padding: 5px 20px 5px 20px;" v-for="(item,index) in lists[active].options" :key="index">
 						<van-col span="1">
 							<div style="margin-top: 18px;">
 								<i v-bind:class="item.bindclass">&#xe622;</i>
@@ -90,7 +90,7 @@
 						</van-col>
 						<van-col span="22">
 							<div>
-								<p>{{item.sorts+'.'+item.title}}</p>
+								<p>{{item.sort+'.'+item.title}}</p>
 							</div>
 						</van-col>
 					</van-row>
@@ -107,95 +107,113 @@
 </template>
 
 <script>
+	import {
+		GetCollection,
+		GetCancelcollection
+	} from '@/request/api.js'
 	import Bg2 from "@/components/Bg2.vue"
 	export default {
 		data() {
 			return {
-				lists: [{
-						id: 69,
-						title: "11以下关于循环结构的描述，错误的是：",
-						sorts: 49,
-						grouping: "第一套真题模拟",
-						right_key: "A",
-						analysis: "暂无解析",
-						option: [{
-							title: "遍历循环使用 for < 循环变量> in < 循环结构>语句，其中循环结构不能是文件",
-							sorts: "A"
-						}, {
-							title: "使用 range() 函数可以指定 for 循环的次数",
-							sorts: "B"
-						}, {
-							title: "for i in range(5) 表示循环 5 次，i 的值是从 0 到 4",
-							sorts: "C"
-						}, {
-							title: "用字符串做循环结构的时候，循环的次数是字符串的长度",
-							sorts: "D"
-						}]
-					},
-					{
-						id: 70,
-						title: "22以下关于循环结构的描述，错误的是：",
-						sorts: 49,
-						grouping: "第一套真题模拟",
-						right_key: "A",
-						analysis: "暂无解析",
-						option: [{
-							title: "遍历循环使用 for < 循环变量> in < 循环结构>语句，其中循环结构不能是文件",
-							sorts: "A"
-						}, {
-							title: "使用 range() 函数可以指定 for 循环的次数",
-							sorts: "B"
-						}, {
-							title: "for i in range(5) 表示循环 5 次，i 的值是从 0 到 4",
-							sorts: "C"
-						}, {
-							title: "用字符串做循环结构的时候，循环的次数是字符串的长度",
-							sorts: "D"
-						}]
-					},
-					{
-						id: 71,
-						title: "33以下关于循环结构的描述，错误的是：",
-						sorts: 49,
-						grouping: "第一套真题模拟",
-						right_key: "A",
-						analysis: "暂无解析",
-						option: [{
-							title: "遍历循环使用 for < 循环变量> in < 循环结构>语句，其中循环结构不能是文件",
-							sorts: "A"
-						}, {
-							title: "使用 range() 函数可以指定 for 循环的次数",
-							sorts: "B"
-						}, {
-							title: "for i in range(5) 表示循环 5 次，i 的值是从 0 到 4",
-							sorts: "C"
-						}, {
-							title: "用字符串做循环结构的时候，循环的次数是字符串的长度",
-							sorts: "D"
-						}]
-					}
-				],
-				active: 0
+				lists: [],
+				active: 0,
+				activeid: '',
+				userid: '',
+				checked: '',
+				right_key: '',
+				question: ''
 			}
 		},
 		components: {
 			Bg2
 		},
-		created() {
-			for (var i = 0; i < this.lists[0].option.length; i++) {
-				this.lists[0].option[i].bindclass = "icon-xxx iconfont checkbox"
-			}
+		mounted() {
+			this.activeid = this.$route.query.subjectid
+			this.userid = this.$route.query.userid
+			this.getCollection()
 		},
-		methods:{
-			go_back(){
+		methods: {
+			go_back() {
 				this.$router.push("/mycollection")
+			},
+			// 获取收藏列表
+			getCollection() {
+				var query = {
+					userid: this.userid
+				}
+				GetCollection(query).then(res => {
+					this.lists = res.data
+					for (var i = 0; i < this.lists.length; i++) {
+						for (var k = 0; k < this.lists[i].options.length; k++) {
+							this.lists[i].options[k].bindclass = "icon-xxx iconfont checkbox"
+							for (var z = 0; z < this.lists[i].options.length; z++) {
+								if (this.lists[i].options[z].sort == this.lists[i].right_key) {
+									this.lists[i].options[z].bindclass = "icon-xxx iconfont checkedbox"
+								}
+							}
+						}
+					}
+				})
+				this.getQuestion()
+			},
+			// 显示当前题
+			getQuestion() {
+				for (var i = 0; i < this.lists.length; i++) {
+					if (this.lists[i].subjectid == this.activeid) {
+						this.active = i
+						this.selected(this.active)
+					}
+				}
+			},
+			// 移除
+			cancelcollection() {
+				var query = {
+					collectionid: this.question.collectionid
+				}
+				GetCancelcollection(query).then(res => {
+					window.console.log(res)
+					this.$toast("取消收藏成功！")
+					this.getCollection()
+				})
+			},
+			// 跳转题目
+			selected(index) {
+				window.console.log(index)
+				this.question = this.lists[index]
+				this.active = index
+				for (var i = 0; i < this.question.options.length; i++) {
+					this.question.options[i].bindclass = "icon-xxx iconfont checkbox"
+					for (var k = 0; k < this.question.options.length; k++) {
+						if (this.question.options[k].sort == this.question.right_key) {
+							this.question.options[k].bindclass = "icon-xxx iconfont checkedbox"
+						}
+					}
+				}
+			},
+			// 上一题
+			prve() {
+				if(this.active+1 == 1){
+					this.$toast("已经是第一题了！")
+					return
+				}else{
+					var prve = this.active - 1
+					this.selected(prve)
+				}
+			},
+			// 下一题
+			next() {
+				if (this.active < this.lists.length-1) {
+					var next = this.active + 1
+					this.selected(next)
+				} else {
+					this.$toast("已经是最后一题了！")
+				}
 			}
 		}
 	}
 </script>
 
 <style lang="css" scoped>
-	
 	.iconfont {
 		font-family: "iconfont" !important;
 		font-size: 16px;
@@ -204,7 +222,7 @@
 		-webkit-text-stroke-width: 0.2px;
 		-moz-osx-font-smoothing: grayscale;
 	}
-	
+
 	@font-face {
 		font-family: 'iconfont';
 		/* project id 1545572 */
@@ -215,8 +233,8 @@
 			url('//at.alicdn.com/t/font_1545572_1ppfnmqy2vb.ttf') format('truetype'),
 			url('//at.alicdn.com/t/font_1545572_1ppfnmqy2vb.svg#iconfont') format('svg');
 	}
-	
-	
+
+
 	.back_icon {
 		margin-top: 20px;
 	}
@@ -273,7 +291,7 @@
 		font-size: 16px;
 		color: #F1234F;
 	}
-	
+
 	.question_text {
 		width: 345px;
 		height: 100%;
@@ -284,7 +302,7 @@
 		padding-bottom: 5px;
 		box-shadow: 0px 1px 2px 0.5px rgba(133, 184, 253, 0.4);
 	}
-	
+
 	.question_text img {
 		width: 54px;
 		height: 18px;
@@ -292,7 +310,7 @@
 		bottom: -4px;
 		padding-right: 10px;
 	}
-	
+
 	.question_text p {
 		font-size: 14px;
 		color: #333333;

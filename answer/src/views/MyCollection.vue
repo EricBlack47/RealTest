@@ -117,19 +117,17 @@
 						pushcode = 1
 						this.lists[index].bindclass = 'question_text'
 						this.selectedlists[i] = ""
-						window.console.log(this.selectedlists)
 					}
 				}
 				if (pushcode == 0) {
 					this.lists[index].bindclass = 'question_text background_green'
 					this.selectedlists.push(this.lists[index])
-					window.console.log(this.selectedlists)
 				}
 				this.$forceUpdate()
 			},
 			// 跳转题目详情
 			gotodetail(item) {
-				window.console.log(item)
+				this.$router.push({path:"/questiondetail",query:{subjectid:item.subjectid,userid:this.userid}})
 			},
 			// 全选
 			selecteall() {
@@ -209,7 +207,7 @@
 	}
 
 	.background_green {
-		background: #EAFFEA;
+		background: #F6F5F6;
 	}
 
 	.question_text img {

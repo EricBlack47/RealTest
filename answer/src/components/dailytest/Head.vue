@@ -393,6 +393,7 @@
 		justify-content: center;
 		height: 100%;
 		margin-top: 130px;
+		z-index: 10;
 	}
 
 	.block {
@@ -498,7 +499,7 @@
 		bottom: 0;
 		width: 100%;
 		height: 43.5px;
-		z-index: 10;
+		z-index: 1;
 		background: #FFFFFF;
 		box-shadow: 0px -1.5px 2px -0.5px rgba(133, 184, 253, 0.4);
 	}
