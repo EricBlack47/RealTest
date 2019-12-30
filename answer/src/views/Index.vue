@@ -52,7 +52,7 @@
 						<van-row>
 							<!-- 我的收藏 -->
 							<van-col span="24">
-								<router-link to="/test">
+								<router-link to="/mycollection">
 									<img :src="my" width="100%" />
 								</router-link>
 							</van-col>

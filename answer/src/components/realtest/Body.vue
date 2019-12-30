@@ -650,6 +650,7 @@
 		justify-content: center;
 		height: 100%;
 		margin-top: 130px;
+		-webkit-overflow-scrolling: touch;
 	}
 
 	.block {
@@ -658,6 +659,7 @@
 		background-color: #fff;
 		margin: 0 auto;
 		overflow-y: scroll;
+		-webkit-overflow-scrolling: touch;
 	}
 
 	.num {

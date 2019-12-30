@@ -181,7 +181,7 @@
 			var userid = localStorage.getItem("userid")
 			this.userid = userid
 			var query = {
-				userid:this.userid
+				userid: this.userid
 			}
 			GetDailyTest(query).then(res => {
 				this.lists = res.data
@@ -190,8 +190,15 @@
 				for (var i = 0; i < this.question[0].option.length; i++) {
 					this.question[0].option[i].bindclass = "icon-xxx iconfont checkbox"
 				}
+				if (this.question[0].collections == true) {
+					this.unlike = false
+					this.liked = true
+				} else {
+					this.unlike = true
+					this.liked = false
+				}
 			})
-			
+
 		},
 		methods: {
 			// 收藏
@@ -200,7 +207,8 @@
 				this.unlike = false
 				var query = {
 					userid: this.userid,
-					subjectid: this.question[0].id
+					subjectid: this.question[0].id,
+					option: this.checked
 				}
 				GetAddcollection(query).then(res => {
 					window.console.log(res)
@@ -226,6 +234,7 @@
 			},
 			// 跳转题目
 			selected(index) {
+				window.console.log(1)
 				this.active = index + 1
 				this.question = this.lists[index]
 				this.show = false
@@ -250,6 +259,13 @@
 							}
 						}
 					}
+				}
+				if (this.question[0].collections == true) {
+					this.unlike = false
+					this.liked = true
+				} else {
+					this.unlike = true
+					this.liked = false
 				}
 			},
 			// 选择选项
@@ -374,7 +390,6 @@
 
 	.wrapper {
 		display: block;
-		/* align-items: center; */
 		justify-content: center;
 		height: 100%;
 		margin-top: 130px;
@@ -386,6 +401,8 @@
 		background-color: #fff;
 		margin: 0 auto;
 		overflow-y: scroll;
+		overflow: hidden scroll;
+		
 	}
 
 	.num {
@@ -490,8 +507,8 @@
 		font-size: 16px;
 		color: #7AAFFA;
 	}
-	
-	.question_body{
+
+	.question_body {
 		margin-bottom: 80px;
 	}
 </style>

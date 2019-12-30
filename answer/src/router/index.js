@@ -9,14 +9,15 @@ import DailyTest from '../views/DailyTest.vue'
 import Lists from '../views/Lists.vue'
 import RealTest from '../views/RealTest.vue'
 import MyCollection from '../views/MyCollection.vue'
+import QuestionDetail from '../views/QuestionDetail.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
 	{
 		path: '/',
-		name: 'home',
-		component: Home
+		name: 'login',
+		component: Login
 	},
 	{
 		path: '/test',
@@ -62,6 +63,11 @@ const routes = [
 		path: '/mycollection',
 		name: 'mycollection',
 		component: MyCollection
+	},
+	{
+		path: '/questiondetail',
+		name: 'questiondetail',
+		component: QuestionDetail
 	}
 ]
 

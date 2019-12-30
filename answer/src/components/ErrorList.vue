@@ -3,7 +3,7 @@
 		<div v-for="(item,index) in lists" :key="index">
 			<!-- 题目描述 -->
 			<div class="question_text">
-				<p><span><img src="https://jisuanjierji.oss-cn-beijing.aliyuncs.com/sucai/SingleBox.png" /></span>{{item.name}}</p>
+				<p><span><img src="https://jisuanjierji.oss-cn-beijing.aliyuncs.com/sucai/SingleBox.png" /></span>{{item.title}}</p>
 			</div>
 		</div>
 	</div>
@@ -11,31 +11,19 @@
 
 <script>
 	export default {
+		props: ['lists'],
 		data() {
 			return {
-				lists: [{
-						name: "关于题目叙述错误的是？",
-						id: 1
-					},
-					{
-						name: "下面那题是对的？",
-						id: 2
-					},
-					{
-						name: "这个什么鬼？",
-						id: 3
-					},
-					{
-						name: "还有些啥？",
-						id: 4
-					},
-					{
-						name: "这个题目可能很长，也就看看换行后什么样子，尽可能的弄个三行出来吧，试试，不够再加字数来凑！",
-						id: 5
-					}
-				]
+				selectedlist:[],
+				
+			}
+		},
+		watch:{
+			lists(newData) {
+				return newData
 			}
 		}
+
 	}
 </script>
 
@@ -50,6 +38,7 @@
 		padding-bottom: 5px;
 		box-shadow: 0px 1px 2px 0.5px rgba(133, 184, 253, 0.4);
 		margin-top: 20px;
+		margin-bottom: 20px;
 	}
 
 	.question_text img {

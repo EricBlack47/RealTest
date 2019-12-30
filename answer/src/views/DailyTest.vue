@@ -33,16 +33,6 @@
 			Bg2,
 			Head
 		},
-		// created() {
-		// 	GetDailyTest({
-		// 		page: 1,
-		// 		limit: 30
-		// 	}).then(res => {
-		// 		window.console.log(res)
-		// 		this.subjectlist = res.data
-		// 		this.activesubjec = -res.data[this.activecode]
-		// 	})
-		// },
 		methods: {
 			go_back() {
 				this.$router.push('/index')
