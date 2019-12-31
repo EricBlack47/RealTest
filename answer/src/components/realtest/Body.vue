@@ -268,7 +268,8 @@
 		GetCancelcollection,
 		GetRecord,
 		PostRecord,
-		GetAddErrow
+		GetAddErrow,
+		PostIndex
 	} from '@/request/api.js'
 	export default {
 		props: ['name'],
@@ -309,7 +310,8 @@
 				testover: false,
 				collection: false,
 				collectionid: '',
-				localindex: ''
+				localindex: '',
+				getIndex:''
 			}
 		},
 		created() {
@@ -411,6 +413,12 @@
 						collection_list.push(query3)
 					}	
 					localStorage.setItem("collection_array", JSON.stringify(collection_list))
+					var query2 = {
+						userid: this.userid,
+						answer: this.testname,
+						percentage: str_subject_list.length,
+					}
+					this.saveIndex(query2)
 				})
 
 			},
@@ -474,6 +482,12 @@
 					this.unlike = true
 					this.liked = false
 				}
+				var query2 = {
+					userid: this.userid,
+					answer: this.testname,
+					percentage: str_subject_list.length,
+				}
+				this.saveIndex(query2)
 
 			},
 			// 选择选项
@@ -647,6 +661,18 @@
 			// 继续刷题
 			go_more() {
 				this.$router.push('/lists')
+			},
+			// 纪录首页跳转进度
+			saveIndex(item){
+				var query ={
+					userid:this.userid,
+					indexsubject:JSON.stringify(item)
+				}
+				PostIndex(query).then(res =>{
+					if(res.code == 200){
+						window.console.log(res)
+					}
+				})
 			}
 		}
 	}

@@ -35,4 +35,8 @@ export const GetErrowList=obj=>get('/api/queryerrsubject',obj)
 export const GetAddErrow=obj=>get('/api/adderrsubject',obj)
 // 删除错题
 export const GetdelErrow=obj=>get('/api/deleterrsubject',obj)
+// 纪录最后一题
+export const PostIndex=obj=>postfromdata('/api/addindexsubject',obj)
+// 查询最后一题
+export const GetToIndex=obj=>get('/api/queryindexsubject',obj)
 

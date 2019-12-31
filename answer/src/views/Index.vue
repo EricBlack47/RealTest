@@ -17,16 +17,16 @@
 				</van-row>
 			</div>
 			<!-- 已完成多少题 -->
-			<div class="empty_blank" style="margin-top: -10px;">
+			<div class="empty_blank" style="margin-top: -10px;" @click="go_realtest()">
 				<van-row type="flex" justify="center" style="line-height: 3;">
 					<van-col span="4">
 						<img :src="clock" style="width: 80%; margin: 20px 0;" />
 					</van-col>
 					<van-col span="13" style="margin: 2px 0;">
-						<p style="font-size: 16px;font-weight: 500;color:rgba(51,51,51,1);font-family:PingFang SC;">Python二级真题模拟(一)</p>
+						<p style="font-size: 16px;font-weight: 500;color:rgba(51,51,51,1);font-family:PingFang SC;">{{items.answer}}</p>
 					</van-col>
 					<van-col span="6" style="margin: 7px 0;">
-						<p style="font-size: 14px;font-family:PingFang SC;color:rgba(51,51,51,1);">已答22题
+						<p style="font-size: 14px;font-family:PingFang SC;color:rgba(51,51,51,1);">{{"已答"+items.percentage+"题"}}
 							<van-icon name="arrow" style="bottom: -2px;font-size: 16px;" />
 						</p>
 					</van-col>
@@ -73,6 +73,9 @@
 
 <script>
 	import Bg1 from '@/components/Bg1.vue'
+	import {
+		GetToIndex
+	} from '@/request/api.js'
 	export default {
 		data() {
 			return {
@@ -80,7 +83,8 @@
 				daily: 'https://jisuanjierji.oss-cn-beijing.aliyuncs.com/sucai/DailyTest.png',
 				real: 'https://jisuanjierji.oss-cn-beijing.aliyuncs.com/sucai/RealTest.png',
 				my: 'https://jisuanjierji.oss-cn-beijing.aliyuncs.com/sucai/MyFavorite.png',
-				errow: 'https://jisuanjierji.oss-cn-beijing.aliyuncs.com/sucai/ErrowBook.png'
+				errow: 'https://jisuanjierji.oss-cn-beijing.aliyuncs.com/sucai/ErrowBook.png',
+				items:''
 			}
 		},
 		components: {
@@ -88,8 +92,24 @@
 		},
 		created() {
 			var userid = localStorage.getItem("userid")
-			if(!userid){
+			if (!userid) {
 				this.$router.push("/login")
+			}else{
+				var query ={
+					userid:userid
+				}
+				GetToIndex(query).then(res =>{
+					this.items =JSON.parse(res.indexsubject)
+					window.console.log(this.items)
+				})
+			}
+		},
+		methods:{
+			go_realtest(){
+				this.$router.push({
+					path: "/RealTest",
+					query:{"name":this.items.answer}
+				})
 			}
 		}
 	}
