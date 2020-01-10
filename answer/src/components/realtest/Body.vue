@@ -77,7 +77,8 @@
 				<h2>{{"正确率:&nbsp;&nbsp;"+score+"&nbsp;%"}}</h2>
 			</div>
 			<!-- 跳转弹出窗 -->
-			<div style="height: 100vh;background-color: rgba(0,0,0,0.5);position: absolute;top: 0;left: 0;width: 100%;margin: 0 auto;z-index: 10;overflow: hidden;" v-show="show">
+			<div style="height: 100vh;background-color: rgba(0,0,0,0.5);position: absolute;top: 0;left: 0;width: 100%;margin: 0 auto;z-index: 10;overflow: hidden;"
+			 v-show="show">
 				<div style="background-color: white;width: 92%;height: 260px;overflow: scroll;margin: 80px auto;border-radius: 5px;">
 					<div class="num_list" v-for="(item,index) in lists" :key="index">
 						<span class="num" @click="selected(index)" :class="active==index+1?'blueNum':'num'">{{index+1}}</span>
@@ -311,7 +312,7 @@
 				collection: false,
 				collectionid: '',
 				localindex: '',
-				getIndex:''
+				getIndex: ''
 			}
 		},
 		created() {
@@ -335,10 +336,10 @@
 					userid: this.userid,
 					subjectid: this.question[0].id
 				}
-				var collection_list = JSON.parse(localStorage.getItem("collection_array"))	
+				var collection_list = JSON.parse(localStorage.getItem("collection_array"))
 				GetAddcollection(query).then(res => {
 					this.subjectid = res.data.collectionid
-					collection_list.push(query2)	
+					collection_list.push(query2)
 					localStorage.setItem("collection_array", JSON.stringify(collection_list))
 					this.$toast("收藏成功！")
 				})
@@ -351,13 +352,13 @@
 					collectionid: this.subjectid
 				}
 				var collection_list = JSON.parse(localStorage.getItem("collection_array"))
-				for(var i = 0 ;i<collection_list.length;i++){
-					if(this.question[0].id == collection_list[i].subjectid ){
+				for (var i = 0; i < collection_list.length; i++) {
+					if (this.question[0].id == collection_list[i].subjectid) {
 						collection_list[i] = ''
 					}
 				}
 				GetCancelcollection(query).then(res => {
-					if(res.code == 200){
+					if (res.code == 200) {
 						window.console.log(res)
 						localStorage.setItem("collection_array", JSON.stringify(collection_list))
 						this.$toast("取消收藏成功！")
@@ -405,13 +406,13 @@
 						}
 					}
 					// 添加缓存
-					if(this.question[0].collections == true){
-						var query3 ={
+					if (this.question[0].collections == true) {
+						var query3 = {
 							userid: this.userid,
 							subjectid: this.question[0].id
 						}
 						collection_list.push(query3)
-					}	
+					}
 					localStorage.setItem("collection_array", JSON.stringify(collection_list))
 					var query2 = {
 						userid: this.userid,
@@ -440,7 +441,7 @@
 				})
 
 			},
-			
+
 			// 显示弹出窗
 			showList() {
 				this.show = true
@@ -527,7 +528,7 @@
 						"subject_right": this.right_key,
 					}
 					// 如果选择了选项
-					if(this.checked != ''){
+					if (this.checked != '') {
 						// 如果数组为空，则添加当前选项数据
 						if (str_subject_list.length == 0) {
 							str_subject_list.push(subjectdata)
@@ -539,12 +540,12 @@
 								str_subject_list[i] = subjectdata
 							}
 						}
-						if(pushcode==0){
+						if (pushcode == 0) {
 							str_subject_list.push(subjectdata)
 						}
 						localStorage.setItem("real_array", JSON.stringify(str_subject_list))
 					}
-					
+
 					this.selected(next)
 				} else {
 					this.$toast("已经是最后一题了！")
@@ -590,20 +591,20 @@
 						}
 						// 计算分数
 						var final = 0
-						for (var x=0;x<str_subject_list.length;x++){
-							if(str_subject_list[x].subject_item == str_subject_list[x].subject_right){
+						for (var x = 0; x < str_subject_list.length; x++) {
+							if (str_subject_list[x].subject_item == str_subject_list[x].subject_right) {
 								final += 1
 							}
 						}
 						// 收集错题
-						for(var b = 0;b<str_subject_list.length;b++){
-							if(str_subject_list[b].subject_item != str_subject_list[b].subject_right){
+						for (var b = 0; b < str_subject_list.length; b++) {
+							if (str_subject_list[b].subject_item != str_subject_list[b].subject_right) {
 								var query = {
-									userid:this.userid,
-									subjectid:str_subject_list[b].subject_id,
-									option:str_subject_list[b].subject_item
+									userid: this.userid,
+									subjectid: str_subject_list[b].subject_id,
+									option: str_subject_list[b].subject_item
 								}
-								GetAddErrow(query).then(res =>{
+								GetAddErrow(query).then(res => {
 									window.console.log(res)
 								})
 							}
@@ -623,10 +624,12 @@
 						PostRecord(query2).then(res => {
 							window.console.log(res)
 						})
+					} else {
+						this.$toast("还一题都没有做！")
+						return;
 					}
-				} else {
-					this.$toast("还一题都没有做！")
-
+				}else{
+					this.$toast("系统繁忙请重试！")
 				}
 			},
 			// 只看错题
@@ -663,13 +666,13 @@
 				this.$router.push('/lists')
 			},
 			// 纪录首页跳转进度
-			saveIndex(item){
-				var query ={
-					userid:this.userid,
-					indexsubject:JSON.stringify(item)
+			saveIndex(item) {
+				var query = {
+					userid: this.userid,
+					indexsubject: JSON.stringify(item)
 				}
-				PostIndex(query).then(res =>{
-					if(res.code == 200){
+				PostIndex(query).then(res => {
+					if (res.code == 200) {
 						window.console.log(res)
 					}
 				})
