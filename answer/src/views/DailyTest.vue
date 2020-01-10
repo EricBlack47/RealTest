@@ -1,5 +1,5 @@
 <template>
-	<div style="overflow-y: scroll;">
+	<div>
 		<Bg2>
 			<div>
 				<van-row>

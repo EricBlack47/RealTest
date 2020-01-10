@@ -24,7 +24,7 @@
 		background-image: url(https://jisuanjierji.oss-cn-beijing.aliyuncs.com/sucai/BgBlue.png);
 		background-repeat: no-repeat;
 		background-size: 100% 100%;
-		height: 667px;
+		height: 100vh;
 	}
 	.input_box_bg{
 		padding-top: 61px;

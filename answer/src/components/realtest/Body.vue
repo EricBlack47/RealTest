@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div style="padding-bottom: 60px;">
 		<!-- 头部 -->
 		<div class="head_bg">
 			<van-row style="line-height:2 ;">

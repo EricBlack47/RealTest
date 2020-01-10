@@ -23,7 +23,7 @@
 		background-image: url("https://jisuanjierji.oss-cn-beijing.aliyuncs.com/sucai/BgGray.png");
 		background-repeat: no-repeat;
 		background-size: 100% 100%;
-		height: 667px;
+		height: 100vh;
 	}
 	.blue_title{
 		background-image: url("https://jisuanjierji.oss-cn-beijing.aliyuncs.com/sucai/BlueTitle.png");

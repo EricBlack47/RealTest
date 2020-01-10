@@ -112,7 +112,6 @@
 			},
 			// 选中题目
 			selected(index) {
-				window.console.log(index)
 				if (this.selectedlists.length == 0) {
 					this.selectedlists.push(this.lists[index])
 				}

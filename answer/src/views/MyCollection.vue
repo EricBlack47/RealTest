@@ -111,8 +111,9 @@
 				}
 			},
 			// 选中题目
-			selected(index) {
+			selected(index) {		
 				if (this.selectedlists.length == 0) {
+					this.lists[index].bindclass = 'question_text background_green'
 					this.selectedlists.push(this.lists[index])
 				}
 				var pushcode = 0
@@ -163,9 +164,14 @@
 							collectionid: this.selectedlists[i].collectionid
 						}
 						GetCancelcollection(query).then(res => {
-							window.console.log(res)
-							this.$toast("取消收藏成功！")
-							this.getCollection()
+							if(res.code == 200){
+								this.$toast("取消收藏成功！")
+								this.getCollection()
+							}else{
+								this.$toast("服务器繁忙请重试！")
+								return
+							}
+							
 						})
 					}	
 				}

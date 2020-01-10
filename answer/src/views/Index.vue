@@ -23,10 +23,10 @@
 						<img :src="clock" style="width: 80%; margin: 20px 0;" />
 					</van-col>
 					<van-col span="13" style="margin: 2px 0;">
-						<p style="font-size: 16px;font-weight: 500;color:rgba(51,51,51,1);font-family:PingFang SC;">{{items.answer}}</p>
+						<p style="font-size: 16px;font-weight: 500;color:rgba(51,51,51,1);font-family:PingFang SC;">{{items !=''?(items.answer):"暂未做题"}}</p>
 					</van-col>
 					<van-col span="6" style="margin: 7px 0;">
-						<p style="font-size: 14px;font-family:PingFang SC;color:rgba(51,51,51,1);">{{"已答"+items.percentage+"题"}}
+						<p style="font-size: 14px;font-family:PingFang SC;color:rgba(51,51,51,1);">{{items !=''?("已答"+items.percentage+"题"):""}}
 							<van-icon name="arrow" style="bottom: -2px;font-size: 16px;" />
 						</p>
 					</van-col>
@@ -84,7 +84,7 @@
 				real: 'https://jisuanjierji.oss-cn-beijing.aliyuncs.com/sucai/RealTest.png',
 				my: 'https://jisuanjierji.oss-cn-beijing.aliyuncs.com/sucai/MyFavorite.png',
 				errow: 'https://jisuanjierji.oss-cn-beijing.aliyuncs.com/sucai/ErrowBook.png',
-				items:''
+				items: ''
 			}
 		},
 		components: {
@@ -94,22 +94,31 @@
 			var userid = localStorage.getItem("userid")
 			if (!userid) {
 				this.$router.push("/login")
-			}else{
-				var query ={
-					userid:userid
+			} else {
+				var query = {
+					userid: userid
 				}
-				GetToIndex(query).then(res =>{
-					this.items =JSON.parse(res.indexsubject)
-					window.console.log(this.items)
+				GetToIndex(query).then(res => {
+					this.items = JSON.parse(res.indexsubject)
 				})
 			}
 		},
-		methods:{
-			go_realtest(){
-				this.$router.push({
-					path: "/RealTest",
-					query:{"name":this.items.answer}
-				})
+		methods: {
+			go_realtest() {
+				if (this.items) {
+					window.console.log(this.items)
+					this.$router.push({
+						path: "/RealTest",
+						query: {
+							"name": this.items.answer
+						}
+					})
+				} else {
+					this.$router.push({
+						path: "/lists"
+					})
+				}
+
 			}
 		}
 	}
